@@ -60,6 +60,7 @@ const i18n = {
             'sessions': 'sessions',
             'session': 'session',
             'click-to-copy': 'Click to copy path',
+            'filter-projects': 'Filter projects...',
 
             // Toggle visibility
             'toggle-visibility': 'Toggle visibility',
@@ -82,6 +83,18 @@ const i18n = {
 
             // Open in
             'open-in': 'Open in',
+
+            // Teams
+            'teams': 'Teams',
+            'api-teams': 'API: Teams',
+            'no-teams': 'No teams found',
+            'team-members': 'Members',
+            'team-tasks': 'Tasks',
+            'team-status-active': 'active',
+            'team-status-inactive': 'inactive',
+            'task-pending': 'pending',
+            'task-in-progress': 'in progress',
+            'task-completed': 'completed',
         },
 
         es: {
@@ -130,6 +143,7 @@ const i18n = {
             'sessions': 'sesiones',
             'session': 'sesión',
             'click-to-copy': 'Clic para copiar ruta',
+            'filter-projects': 'Filtrar proyectos...',
 
             // Alternar visibilidad
             'toggle-visibility': 'Alternar visibilidad',
@@ -152,6 +166,18 @@ const i18n = {
 
             // Abrir en
             'open-in': 'Abrir en',
+
+            // Equipos
+            'teams': 'Equipos',
+            'api-teams': 'API: Equipos',
+            'no-teams': 'No se encontraron equipos',
+            'team-members': 'Miembros',
+            'team-tasks': 'Tareas',
+            'team-status-active': 'activo',
+            'team-status-inactive': 'inactivo',
+            'task-pending': 'pendiente',
+            'task-in-progress': 'en progreso',
+            'task-completed': 'completada',
         },
 
         zh: {
@@ -200,6 +226,7 @@ const i18n = {
             'sessions': '会话',
             'session': '会话',
             'click-to-copy': '点击复制路径',
+            'filter-projects': '筛选项目...',
 
             // 切换可见性
             'toggle-visibility': '切换可见性',
@@ -222,6 +249,18 @@ const i18n = {
 
             // 打开方式
             'open-in': '打开方式',
+
+            // 团队
+            'teams': '团队',
+            'api-teams': 'API: 团队',
+            'no-teams': '未找到团队',
+            'team-members': '成员',
+            'team-tasks': '任务',
+            'team-status-active': '活跃',
+            'team-status-inactive': '已结束',
+            'task-pending': '待处理',
+            'task-in-progress': '进行中',
+            'task-completed': '已完成',
         }
     },
 
@@ -247,6 +286,10 @@ const i18n = {
                     el.textContent = this.t(key);
                 }
             });
+            // Update placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                el.placeholder = this.t(el.getAttribute('data-i18n-placeholder'));
+            });
         }
     },
 
@@ -269,6 +312,7 @@ function setLanguage(lang) {
     if (typeof loadSources === 'function') loadSources();
     if (typeof loadApps === 'function') loadApps();
     if (typeof loadThemes === 'function') loadThemes();
+    if (typeof loadTeams === 'function') loadTeams();
     if (typeof loadProjects === 'function') loadProjects();
 }
 
@@ -329,6 +373,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             el.textContent = i18n.t(key);
         }
+    });
+
+    // Update placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.placeholder = i18n.t(el.getAttribute('data-i18n-placeholder'));
     });
 
     // Build and set initial language selector state

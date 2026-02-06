@@ -36,6 +36,7 @@
         <button onclick="showApiModal('Projects', '/api/v1/projects')" data-i18n="api-projects">API: Projects</button>
         <button onclick="showApiModal('Apps', '/api/v1/open-in/apps')" data-i18n="api-apps">API: Apps</button>
         <button onclick="showApiModal('Themes', '/api/v1/themes')" data-i18n="api-themes">API: Themes</button>
+        <button onclick="showApiModal('Teams', '/api/v1/teams')" data-i18n="api-teams">API: Teams</button>
     </div>
 
     <div class="content">
@@ -54,11 +55,17 @@
                 <h2><span class="icon">🎨</span> <span data-i18n="themes">Themes</span></h2>
                 <div id="themes-list" class="loading" data-i18n="loading">Loading...</div>
             </div>
+
+            <div class="panel">
+                <h2><span class="icon">👥</span> <span data-i18n="teams">Teams</span> <span id="team-count" class="badge">-</span></h2>
+                <div id="teams-list" class="loading" data-i18n="loading">Loading...</div>
+            </div>
         </div>
 
         <div class="panel projects-panel">
             <h2><span class="icon">📁</span> <span data-i18n="projects">Projects</span> <span id="project-count"
                     class="badge">-</span></h2>
+            <input type="text" id="project-search" class="project-search" placeholder="Filter projects..." data-i18n-placeholder="filter-projects" oninput="filterProjects()">
             <div id="projects-list" class="project-list loading" data-i18n="loading">Loading...</div>
         </div>
     </div>
@@ -302,6 +309,158 @@
             }
         }
 
+        // ===== Teams =====
+        async function loadTeams() {
+            const container = document.getElementById('teams-list');
+            const countBadge = document.getElementById('team-count');
+            try {
+                const res = await fetch(`${API_BASE}/api/v1/teams`);
+                const data = await res.json();
+
+                if (!data.teams || data.teams.length === 0) {
+                    container.innerHTML = `<div class="empty-state">${t('no-teams')}</div>`;
+                    countBadge.textContent = '0';
+                    return;
+                }
+
+                countBadge.textContent = data.teams.length;
+
+                container.innerHTML = data.teams.map(team => `
+                    <div class="team-item" onclick="showTeamDetail('${escapeHtml(team.name)}')">
+                        <div>
+                            <div class="team-name">${escapeHtml(team.name)}</div>
+                            <div class="team-meta">${team.members ? team.members.length : 0} ${t('team-members').toLowerCase()} · ${team.created_at ? formatDate(team.created_at) : '-'}</div>
+                        </div>
+                        ${renderTeamStatus(team.status)}
+                    </div>
+                `).join('');
+            } catch (e) {
+                container.innerHTML = `<div class="error">${t('error')}: ${escapeHtml(e.message)}</div>`;
+            }
+        }
+
+        function renderTeamStatus(status) {
+            const label = status === 'active' ? t('team-status-active') : t('team-status-inactive');
+            const cls = status === 'active' ? 'active' : 'inactive';
+            return `<span class="team-status ${cls}">${label}</span>`;
+        }
+
+        function renderTaskStatus(status) {
+            let label, cls;
+            switch (status) {
+                case 'in_progress':
+                    label = t('task-in-progress');
+                    cls = 'in-progress';
+                    break;
+                case 'completed':
+                    label = t('task-completed');
+                    cls = 'completed';
+                    break;
+                default:
+                    label = t('task-pending');
+                    cls = 'pending';
+            }
+            return `<span class="task-status ${cls}">${label}</span>`;
+        }
+
+        async function showTeamDetail(teamName) {
+            const overlay = document.getElementById('modal-overlay');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            const rawLink = document.getElementById('modal-raw-link');
+
+            const teamUrl = `${API_BASE}/api/v1/teams/${encodeURIComponent(teamName)}`;
+            modalTitle.textContent = teamName;
+            rawLink.href = teamUrl;
+            modalContent.innerHTML = `<span class="loading">${t('loading')}</span>`;
+            overlay.classList.add('active');
+
+            try {
+                const [teamRes, tasksRes] = await Promise.all([
+                    fetch(teamUrl),
+                    fetch(`${API_BASE}/api/v1/teams/${encodeURIComponent(teamName)}/tasks`)
+                ]);
+                const team = await teamRes.json();
+                const tasksData = await tasksRes.json();
+                const tasks = tasksData.tasks || [];
+
+                let html = '';
+
+                // Header
+                html += `<div class="team-detail-header">
+                    <h2>${escapeHtml(team.name || teamName)}</h2>
+                    ${renderTeamStatus(team.status)}
+                </div>`;
+
+                if (team.description) {
+                    html += `<div class="team-detail-meta">${escapeHtml(team.description)}</div>`;
+                }
+                if (team.created_at) {
+                    html += `<div class="team-detail-meta">${formatDate(team.created_at)}</div>`;
+                }
+
+                // Members
+                const members = team.members || [];
+                html += `<div class="team-detail-section">
+                    <h3>${t('team-members')} (${members.length})</h3>`;
+
+                if (members.length === 0) {
+                    html += `<div class="empty-state">${t('no-teams')}</div>`;
+                } else {
+                    html += members.map(m => {
+                        const colorDot = m.color
+                            ? `<span class="member-color" style="background: ${escapeHtml(m.color)}"></span>`
+                            : `<span class="member-color" style="background: #666"></span>`;
+                        const details = [m.agent_type, m.model].filter(Boolean).join(' · ');
+                        const joined = m.joined_at ? formatDate(m.joined_at) : '';
+                        return `<div class="member-row">
+                            <div class="member-info">
+                                ${colorDot}
+                                <div>
+                                    <div>${escapeHtml(m.name)}</div>
+                                    ${details ? `<div class="member-details">${escapeHtml(details)}</div>` : ''}
+                                </div>
+                            </div>
+                            ${joined ? `<span class="member-details">${joined}</span>` : ''}
+                        </div>`;
+                    }).join('');
+                }
+                html += `</div>`;
+
+                // Tasks (filter out internal)
+                const visibleTasks = tasks.filter(t => !t.is_internal);
+                html += `<div class="team-detail-section">
+                    <h3>${t('team-tasks')} (${visibleTasks.length})</h3>`;
+
+                if (visibleTasks.length === 0) {
+                    html += `<div class="empty-state">-</div>`;
+                } else {
+                    html += visibleTasks.map(task => {
+                        const owner = task.owner ? `<span class="member-details">${escapeHtml(task.owner)}</span>` : '';
+                        return `<div class="task-row">
+                            <div class="task-info">
+                                <div>
+                                    <div>${escapeHtml(task.subject)}</div>
+                                    ${task.blocked_by && task.blocked_by.length > 0
+                                        ? `<div class="task-details">blocked by: ${task.blocked_by.join(', ')}</div>`
+                                        : ''}
+                                </div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:0.5rem;">
+                                ${owner}
+                                ${renderTaskStatus(task.status)}
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+                html += `</div>`;
+
+                modalContent.innerHTML = html;
+            } catch (e) {
+                modalContent.innerHTML = `<span class="error">${t('error')}: ${escapeHtml(e.message)}</span>`;
+            }
+        }
+
         // Detect home directory prefix
         function detectHomeDir(projects) {
             if (!projects || projects.length === 0) return null;
@@ -422,7 +581,7 @@
                 const homeDir = detectHomeDir(sorted);
 
                 container.innerHTML = sorted.map(p => `
-                    <div class="project-item${p.pathExists ? '' : ' path-missing'}">
+                    <div class="project-item${p.pathExists ? '' : ' path-missing'}" data-path="${escapeHtml(p.path.toLowerCase())}">
                         <div class="project-info">
                             <div class="project-path">${!p.pathExists ? `<span class="path-missing-icon" title="${t('path-missing')}">🚫</span> ` : ''}${formatPathWithDim(p.path, homeDir)}</div>
                             <div class="source-row">
@@ -439,6 +598,9 @@
                         </div>
                     </div>
                 `).join('');
+
+                // Re-apply search filter if active
+                filterProjects();
             } catch (e) {
                 container.innerHTML = `<div class="error">${t('error')}: ${escapeHtml(e.message)}</div>`;
             }
@@ -495,6 +657,27 @@
             loadProjects();
         }
 
+        function filterProjects() {
+            const query = document.getElementById('project-search').value.toLowerCase();
+            const items = document.querySelectorAll('#projects-list .project-item');
+            let visible = 0;
+            items.forEach(item => {
+                const path = item.getAttribute('data-path') || '';
+                const match = !query || path.includes(query);
+                item.style.display = match ? '' : 'none';
+                if (match) visible++;
+            });
+            document.getElementById('project-count').textContent = visible;
+        }
+
+        // ===== Keyboard Shortcuts =====
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' && document.activeElement !== document.getElementById('project-search')) {
+                e.preventDefault();
+                document.getElementById('project-search').focus();
+            }
+        });
+
         // ===== Theme Toggle =====
         function getPreferredTheme() {
             const stored = localStorage.getItem('theme');
@@ -521,6 +704,7 @@
 
         // ===== Connection Status =====
         let pingInterval;
+        let isConnected = false;
         const PING_INTERVAL_MS = 10000; // 10 seconds
 
         function updateConnectionStatus(status, text) {
@@ -530,6 +714,7 @@
             statusEl.classList.remove('connected', 'disconnected', 'checking');
             statusEl.classList.add(status);
             textEl.textContent = text;
+            if (status !== 'checking') isConnected = (status === 'connected');
         }
 
         async function pingServer() {
@@ -566,15 +751,42 @@
             }
         }
 
+        // ===== Auto-Refresh =====
+        const REFRESH_INTERVAL_MS = 30000;
+        let refreshInterval;
+
+        function refreshData() {
+            if (!isConnected) return;
+            loadSources();
+            loadThemes();
+            loadTeams();
+            loadApps().then(() => loadProjects());
+        }
+
+        function startRefreshInterval() {
+            stopRefreshInterval();
+            refreshInterval = setInterval(refreshData, REFRESH_INTERVAL_MS);
+        }
+
+        function stopRefreshInterval() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+            }
+        }
+
         // Start pinging when page loads
         startPingInterval();
+        startRefreshInterval();
 
-        // Pause pinging when page is hidden to save resources
+        // Pause pinging and refresh when page is hidden to save resources
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 stopPingInterval();
+                stopRefreshInterval();
             } else {
                 startPingInterval();
+                startRefreshInterval();
                 pingServer(); // Immediate check when becoming visible
             }
         });
@@ -582,6 +794,7 @@
         // Load all data
         loadSources();
         loadThemes();
+        loadTeams();
         loadApps().then(() => loadProjects()); // Load projects after apps are available
     </script>
 </body>
