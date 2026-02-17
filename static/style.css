@@ -459,6 +459,20 @@ h1 {
     color: #7fcc5a;
 }
 
+.source-item.source-codex {
+    border-left: 3px solid #4f8cff;
+}
+.source-item.source-codex .source-name {
+    color: #4f8cff;
+}
+
+.source-item.source-qwen {
+    border-left: 3px solid #ff6b9d;
+}
+.source-item.source-qwen .source-name {
+    color: #ff6b9d;
+}
+
 /* ===== Themes ===== */
 .theme-item.active {
     border: 1px solid #00ff88;
@@ -582,6 +596,18 @@ h1 {
     background: rgba(110, 186, 76, 0.2);
     color: #7fcc5a;
     border: 1px solid rgba(110, 186, 76, 0.3);
+}
+
+.source-badge.source-codex {
+    background: rgba(79, 140, 255, 0.2);
+    color: #4f8cff;
+    border: 1px solid rgba(79, 140, 255, 0.3);
+}
+
+.source-badge.source-qwen {
+    background: rgba(255, 107, 157, 0.2);
+    color: #ff6b9d;
+    border: 1px solid rgba(255, 107, 157, 0.3);
 }
 
 .source-badge.source-default {
