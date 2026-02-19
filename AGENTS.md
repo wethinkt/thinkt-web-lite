@@ -9,7 +9,7 @@ This is the web frontend for [go-thinkt](https://github.com/wethinkt/go-thinkt).
 ## Architecture
 
 - **`index.html`** — Single-page app. All JavaScript is inline in a `<script>` tag. This is the entry point and contains all application logic (API calls, DOM rendering, state management).
-- **`static/style.css`** — Complete styling including dark mode, light mode, responsive layout, and source-specific colors (Claude=orange, Kimi=purple, Gemini=blue, Copilot=green).
+- **`static/style.css`** — Complete styling including dark mode, light mode, responsive layout, and source-specific colors (Claude=orange, Kimi=purple, Gemini=blue, Copilot=green, Codex=teal, Qwen=amber).
 - **`static/i18n.js`** — Internationalization module. Loaded before `index.html`'s inline script. Exposes a global `i18n` object and a `t()` helper. Supports `en`, `es`, `zh`.
 
 ## Key Conventions

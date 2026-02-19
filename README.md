@@ -50,7 +50,7 @@ The dashboard consumes these go-thinkt API routes:
 
 | Endpoint | Description |
 |---|---|
-| `GET /api/v1/sources` | List data sources (Claude, Kimi, Gemini, Copilot) |
+| `GET /api/v1/sources` | List data sources (Claude, Kimi, Gemini, Copilot, Codex, Qwen) |
 | `GET /api/v1/projects` | List projects with session counts |
 | `GET /api/v1/open-in/apps` | List available apps for opening projects |
 | `GET /api/v1/themes` | List available themes |

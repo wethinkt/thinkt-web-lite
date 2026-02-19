@@ -501,9 +501,25 @@
             return `<span class="path-dim">${escapeHtml(dimPart)}</span><span class="path-highlight">${escapeHtml(highlightPart)}</span>`;
         }
 
-        // Render source badges
+        const SOURCE_ORDER = {
+            claude: 0,
+            kimi: 1,
+            gemini: 2,
+            copilot: 3,
+            codex: 4,
+            qwen: 5,
+        };
+
+        // Render source badges in canonical source order.
         function renderSourceBadges(sources) {
-            return sources.map(s => {
+            return [...sources].sort((a, b) => {
+                const aKey = String(a.name || '').toLowerCase();
+                const bKey = String(b.name || '').toLowerCase();
+                const aOrder = SOURCE_ORDER[aKey] ?? 99;
+                const bOrder = SOURCE_ORDER[bKey] ?? 99;
+                if (aOrder !== bOrder) return aOrder - bOrder;
+                return aKey.localeCompare(bKey);
+            }).map(s => {
                 const sourceClass = `source-${s.name.toLowerCase()}`;
                 return `<span class="source-badge ${sourceClass}">
                     ${escapeHtml(s.name)}
