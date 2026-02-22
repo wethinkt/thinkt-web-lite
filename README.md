@@ -1,6 +1,6 @@
 # thinkt-web-lite
 
-Lightweight web dashboard for [go-thinkt](https://github.com/wethinkt/go-thinkt) when the user invokes `thinkt serve lite`. 
+Lightweight web dashboard for [go-thinkt](https://github.com/wethinkt/go-thinkt) when the user invokes `thinkt server lite`. 
 
 Vanilla HTML/CSS/JS — no build tools, no dependencies.
 
@@ -31,7 +31,7 @@ git submodule update --init --recursive
 
 ### Workflow
 
-1. Run the go-thinkt server — `thinkt serve lite` — it serves the webapp on the same origin.
+1. Run the go-thinkt server — `thinkt server lite` — it serves the webapp on the same origin.
 2. Edit files in `internal/server/web-lite/`. Changes are picked up on rebuild.
 3. Commit and push from inside the submodule directory.
 4. Back in the go-thinkt root, stage the updated submodule ref and commit:
