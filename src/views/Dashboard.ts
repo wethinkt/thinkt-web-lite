@@ -2,13 +2,13 @@
 import { apiClient } from '../api';
 
 function formatNumber(num?: number): string {
-    if (num === undefined) return '—';
-    return num.toLocaleString();
+  if (num === undefined) return '—';
+  return num.toLocaleString();
 }
 
 function formatUptime(seconds?: number): string {
-    if (seconds === undefined) return '—';
-    if (seconds < 60) return `${seconds}s`;
+  if (seconds === undefined) return '—';
+  if (seconds < 60) return `${seconds}s`;
   const hrs = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
   if (hrs > 0) return `${hrs}h ${mins}m`;
@@ -43,7 +43,7 @@ function progressBar(done?: number, total?: number) {
     `;
 }
 
-export function renderDashboard(container: HTMLElement) {
+export function renderDashboard(container: HTMLElement, _headerControls?: HTMLElement | null) {
   container.innerHTML = `
     <!-- Connection Status -->
     <div class="panel">

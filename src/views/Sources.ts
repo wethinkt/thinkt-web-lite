@@ -3,17 +3,9 @@ import { apiClient } from '../api';
 import { createJsonViewer } from '../components/JsonViewer';
 import { getSourceBadgeStyle } from '../utils';
 
-export function renderSources(container: HTMLElement) {
+export function renderSources(container: HTMLElement, headerControls?: HTMLElement | null) {
     container.innerHTML = `
         <div class="panel">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2><span class="icon">🔌</span> Sources</h2>
-                <div class="tabs-header">
-                    <button class="tab-btn active" data-target="sources-rendered">Rendered</button>
-                    <button class="tab-btn" data-target="sources-raw">Raw JSON</button>
-                </div>
-            </div>
-            
             <div id="sources-rendered" class="tab-content active">
                 <div id="sources-list" class="loading">Loading sources...</div>
             </div>
@@ -23,9 +15,25 @@ export function renderSources(container: HTMLElement) {
         </div>
     `;
 
+    if (headerControls) {
+        headerControls.innerHTML = `<div class="tabs-header">
+                    <button class="tab-btn active" data-target="sources-rendered">Rendered</button>
+                    <button class="tab-btn" data-target="sources-raw">Raw JSON</button>
+                </div>`;
+    } else {
+        // Fallback if no global header
+        const fallbackHeader = document.createElement("div");
+        fallbackHeader.style.cssText = "display: flex; justify-content: flex-end; margin-bottom: 1rem;";
+        fallbackHeader.innerHTML = `<div class="tabs-header">
+                    <button class="tab-btn active" data-target="sources-rendered">Rendered</button>
+                    <button class="tab-btn" data-target="sources-raw">Raw JSON</button>
+                </div>`;
+        container.insertBefore(fallbackHeader, container.firstChild);
+    }
+
     const listContainer = document.getElementById('sources-list');
     const jsonContainer = document.getElementById('sources-json-container');
-    const tabBtns = container.querySelectorAll('.tab-btn');
+    const tabBtns = (headerControls || container).querySelectorAll('.tab-btn');
     const tabContents = container.querySelectorAll('.tab-content');
 
     // Handle tab switching
@@ -57,13 +65,15 @@ export function renderSources(container: HTMLElement) {
                             <div>
                                 <div class="list-item-title">
                                     ${s.name}
-                                    ${s.can_resume ? `<span class="badge" title="This source supports continuous conversation history">Resumable</span>` : ''}
                                 </div>
                                 <div class="list-item-meta">
                                     Source: <span class="badge" style="${styleStr}">${s.name}</span>
                                 </div>
                             </div>
-                            <div class="source-status online">Online</div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                ${s.can_resume ? `<span class="badge" title="This source supports continuous conversation history">Resumable</span>` : ''}
+                                <div class="source-status online">Online</div>
+                            </div>
                         </div>
                     `}).join('');
                 }

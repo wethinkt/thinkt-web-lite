@@ -2,17 +2,9 @@
 import { apiClient } from '../api';
 import { createJsonViewer } from '../components/JsonViewer';
 
-export function renderApps(container: HTMLElement) {
+export function renderApps(container: HTMLElement, headerControls?: HTMLElement | null) {
     container.innerHTML = `
         <div class="panel">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2><span class="icon">🧩</span> Allowed Apps</h2>
-                <div class="tabs-header">
-                    <button class="tab-btn active" data-target="apps-rendered">Rendered</button>
-                    <button class="tab-btn" data-target="apps-raw">Raw JSON</button>
-                </div>
-            </div>
-            
             <div id="apps-rendered" class="tab-content active">
                 <div id="apps-list" class="loading">Loading apps...</div>
             </div>
@@ -22,9 +14,25 @@ export function renderApps(container: HTMLElement) {
         </div>
     `;
 
+    if (headerControls) {
+        headerControls.innerHTML = `<div class="tabs-header">
+                    <button class="tab-btn active" data-target="apps-rendered">Rendered</button>
+                    <button class="tab-btn" data-target="apps-raw">Raw JSON</button>
+                </div>`;
+    } else {
+        // Fallback if no global header
+        const fallbackHeader = document.createElement("div");
+        fallbackHeader.style.cssText = "display: flex; justify-content: flex-end; margin-bottom: 1rem;";
+        fallbackHeader.innerHTML = `<div class="tabs-header">
+                    <button class="tab-btn active" data-target="apps-rendered">Rendered</button>
+                    <button class="tab-btn" data-target="apps-raw">Raw JSON</button>
+                </div>`;
+        container.insertBefore(fallbackHeader, container.firstChild);
+    }
+
     const listContainer = document.getElementById('apps-list');
     const jsonContainer = document.getElementById('apps-json-container');
-    const tabBtns = container.querySelectorAll('.tab-btn');
+    const tabBtns = (headerControls || container).querySelectorAll('.tab-btn');
     const tabContents = container.querySelectorAll('.tab-content');
 
     // Handle tab switching

@@ -12,17 +12,9 @@ interface ThemeInfo {
     colors?: ThemeColors;
 }
 
-export function renderThemes(container: HTMLElement) {
+export function renderThemes(container: HTMLElement, headerControls?: HTMLElement | null) {
     container.innerHTML = `
         <div class="panel">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2><span class="icon">🎨</span> Themes</h2>
-                <div class="tabs-header">
-                    <button class="tab-btn active" data-target="themes-rendered">Rendered</button>
-                    <button class="tab-btn" data-target="themes-raw">Raw JSON</button>
-                </div>
-            </div>
-            
             <div id="themes-rendered" class="tab-content active">
                 <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
                     Preview the available themes from the connected Thinkt API.
@@ -36,19 +28,35 @@ export function renderThemes(container: HTMLElement) {
         </div>
     `;
 
+    if (headerControls) {
+        headerControls.innerHTML = `<div class="tabs-header">
+                    <button class="tab-btn active" data-target="themes-rendered">Rendered</button>
+                    <button class="tab-btn" data-target="themes-raw">Raw JSON</button>
+                </div>`;
+    } else {
+        // Fallback if no global header
+        const fallbackHeader = document.createElement("div");
+        fallbackHeader.style.cssText = "display: flex; justify-content: flex-end; margin-bottom: 1rem;";
+        fallbackHeader.innerHTML = `<div class="tabs-header">
+                    <button class="tab-btn active" data-target="themes-rendered">Rendered</button>
+                    <button class="tab-btn" data-target="themes-raw">Raw JSON</button>
+                </div>`;
+        container.insertBefore(fallbackHeader, container.firstChild);
+    }
+
     const listContainer = document.getElementById('themes-list');
     const jsonContainer = document.getElementById('themes-json-container');
-    const tabBtns = container.querySelectorAll('.tab-btn');
+    const tabBtns = (headerControls || container).querySelectorAll('.tab-btn');
     const tabContents = container.querySelectorAll('.tab-content');
 
     // Handle tab switching
     tabBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             const targetId = (e.target as HTMLElement).getAttribute('data-target');
-            
+
             tabBtns.forEach(b => b.classList.remove('active'));
             (e.target as HTMLElement).classList.add('active');
-            
+
             tabContents.forEach(c => {
                 c.classList.remove('active');
                 if (c.id === targetId) c.classList.add('active');
@@ -74,7 +82,7 @@ export function renderThemes(container: HTMLElement) {
                     themes.forEach((theme, i) => {
                         const card = document.createElement('div');
                         card.style.marginBottom = '0.75rem';
-                        
+
                         // Header (clickable)
                         const header = document.createElement('div');
                         header.className = 'list-item';
@@ -82,7 +90,7 @@ export function renderThemes(container: HTMLElement) {
                         header.style.background = 'var(--bg-color)';
                         header.style.borderRadius = '6px';
                         header.style.border = '1px solid var(--border-color)';
-                        
+
                         header.innerHTML = `
                             <div>
                                 <div class="list-item-title" style="display: flex; align-items: center; gap: 0.5rem;">
@@ -97,6 +105,8 @@ export function renderThemes(container: HTMLElement) {
                             </div>
                         `;
 
+
+
                         const previewWrapper = document.createElement('div');
                         previewWrapper.id = `theme-preview-${i}`;
                         previewWrapper.style.display = 'none';
@@ -107,7 +117,7 @@ export function renderThemes(container: HTMLElement) {
                             const isHidden = previewWrapper.style.display === 'none';
                             previewWrapper.style.display = isHidden ? 'block' : 'none';
                             header.querySelector('.toggle-icon')!.textContent = isHidden ? '▲' : '▼';
-                            
+
                             // Lazy render the preview components only when opening the first time
                             if (isHidden && !previewRendered && theme.colors) {
                                 createThemePreview(previewWrapper, theme.colors, theme.name);
@@ -118,7 +128,7 @@ export function renderThemes(container: HTMLElement) {
                         card.appendChild(header);
                         card.appendChild(previewWrapper);
                         listContainer.appendChild(card);
-                        
+
                         // Auto-expand the active theme
                         if (theme.active) {
                             header.click();

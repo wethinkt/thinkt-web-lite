@@ -5,12 +5,11 @@ import { renderSources } from './views/Sources';
 import { renderDashboard } from './views/Dashboard';
 import { renderApps } from './views/Apps';
 import { renderThemes } from './views/Themes';
-import { renderEndpointTester } from './views/EndpointTester';
 
 const app = document.getElementById('app');
 
 if (app) {
-    app.innerHTML = `
+  app.innerHTML = `
     <nav class="sidebar">
       <div class="sidebar-header">
         <a href="https://wethinkt.com" target="_blank" rel="noopener" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 0.4rem; font-family: 'IBM Plex Mono', monospace; font-size: 1.1rem; font-weight: 500;">
@@ -33,9 +32,10 @@ if (app) {
         <div class="nav-item" data-view="themes">
           <span class="icon">🎨</span> Themes
         </div>
-        <div class="nav-item" data-view="tester">
-          <span class="icon">🧰</span> API Tester
-        </div>
+        <a href="/swagger/index.html" target="_blank" rel="noopener" class="nav-item" style="text-decoration: none;">
+          <span class="icon">📚</span> API Docs
+          <span style="margin-left: auto; font-size: 0.8rem; opacity: 0.7;">↗</span>
+        </a>
       </div>
       <div class="theme-toggle" id="theme-toggle">
         <span class="icon">🌓</span> Toggle Theme
@@ -44,6 +44,7 @@ if (app) {
     <main class="main-content">
       <header class="header">
         <h1 id="view-title">Dashboard</h1>
+        <div id="header-controls"></div>
       </header>
       <div class="view-container" id="view-container">
         <!-- Content injected here -->
@@ -71,6 +72,9 @@ if (app) {
   function switchView(viewName: string) {
     if (!viewTitle || !viewContainer) return;
 
+    const headerControls = document.getElementById("header-controls");
+    if (headerControls) headerControls.innerHTML = "";
+
     // Update active nav
     navItems.forEach(item => {
       item.classList.remove('active');
@@ -82,25 +86,22 @@ if (app) {
 
     // Render content
     viewContainer.innerHTML = '';
-    
+
     switch (viewName) {
       case 'dashboard':
-        renderDashboard(viewContainer);
+        renderDashboard(viewContainer, headerControls);
         break;
       case 'projects':
-        renderProjects(viewContainer);
+        renderProjects(viewContainer, headerControls);
         break;
       case 'sources':
-        renderSources(viewContainer);
+        renderSources(viewContainer, headerControls);
         break;
       case 'apps':
-        renderApps(viewContainer);
+        renderApps(viewContainer, headerControls);
         break;
       case 'themes':
-        renderThemes(viewContainer);
-        break;
-      case 'tester':
-        renderEndpointTester(viewContainer);
+        renderThemes(viewContainer, headerControls);
         break;
       default:
         viewContainer.innerHTML = `<div class="error">View "${viewName}" not implemented yet</div>`;
