@@ -1,30 +1,21 @@
 // src/views/Themes.ts
-import { rawApiFetch } from '../api';
+import { apiClient } from '../api';
 import { createJsonViewer } from '../components/JsonViewer';
 import { createThemePreview } from '../components/ThemePreview';
-import { ThemeColors } from '@wethinkt/ts-thinkt';
+import { ThemeInfo } from '@wethinkt/ts-thinkt';
 
 import { createTabbedPanelView } from '../utils';
-
-interface ThemeInfo {
-    name: string;
-    description?: string;
-    active?: boolean;
-    built_in?: boolean;
-    colors?: ThemeColors;
-}
 
 export function renderThemes(container: HTMLElement, headerControls?: HTMLElement | null) {
     const view = createTabbedPanelView(container, headerControls, 'themes', 'Loading themes...');
 
-    // Fetch using rawApiFetch as Theme response doesn't have an adapter in client yet
-    rawApiFetch('/api/v1/themes')
-        .then((data: { themes?: ThemeInfo[]; active?: string }) => {
+    apiClient.getThemes()
+        .then(data => {
             const themes: ThemeInfo[] = (data.themes || []).sort((a, b) => {
                 // Active themes bubble to the top
                 if (a.active && !b.active) return -1;
                 if (!a.active && b.active) return 1;
-                return a.name.localeCompare(b.name);
+                return (a.name || '').localeCompare(b.name || '');
             });
 
             if (view.listContainer) {
@@ -51,9 +42,9 @@ export function renderThemes(container: HTMLElement, headerControls?: HTMLElemen
                         header.innerHTML = `
                             <div>
                                 <div class="list-item-title" style="display: flex; align-items: center; gap: 0.5rem;">
-                                    ${theme.name}
+                                    ${theme.name || 'Unnamed'}
                                     ${theme.active ? '<span class="badge success">Active</span>' : ''}
-                                    ${theme.built_in ? '<span class="badge">Built-in</span>' : ''}
+                                    ${theme.embedded ? '<span class="badge">Built-in</span>' : ''}
                                 </div>
                                 ${theme.description ? `<div class="list-item-meta">${theme.description}</div>` : ''}
                             </div>
@@ -77,7 +68,7 @@ export function renderThemes(container: HTMLElement, headerControls?: HTMLElemen
 
                             // Lazy render the preview components only when opening the first time
                             if (isHidden && !previewRendered && theme.colors) {
-                                createThemePreview(previewWrapper, theme.colors, theme.name);
+                                createThemePreview(previewWrapper, theme.colors, theme.name || 'Unnamed');
                                 previewRendered = true;
                             }
                         });
