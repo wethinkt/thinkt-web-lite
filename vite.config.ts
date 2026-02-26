@@ -9,7 +9,7 @@ export default defineConfig({
         target: 'http://localhost:8784',
         changeOrigin: true,
         headers: {
-          'Authorization': `Bearer ${process.env.THINKT_API_TOKEN || 'test-token'}`,
+          'Authorization': `Bearer ${process.env.THINKT_API_TOKEN || ''}`,
           'Origin': 'http://localhost:8784'
         }
       },

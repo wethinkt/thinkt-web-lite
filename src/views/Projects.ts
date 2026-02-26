@@ -162,7 +162,7 @@ export function renderProjects(container: HTMLElement, _headerControls?: HTMLEle
                 const copyBtn = document.getElementById(`copy-${i}`);
                 if (copyBtn) {
                     copyBtn.addEventListener('click', async () => {
-                        const success = await copyToClipboard(p.id);
+                        const success = await copyToClipboard(p.path);
                         const oldText = copyBtn.textContent;
                         copyBtn.textContent = success ? '✅' : '❌';
                         setTimeout(() => { if (copyBtn) copyBtn.textContent = oldText; }, 2000);
@@ -200,7 +200,7 @@ export function renderProjects(container: HTMLElement, _headerControls?: HTMLEle
                                 await apiClient.execResumeSession(sessionPath);
                             } else {
                                 // Normal open-in
-                                await apiClient.openIn(value, p.id);
+                                await apiClient.openIn(value, p.path);
                             }
                         } catch (err: any) {
                             console.error('Action failed:', err);

@@ -14,16 +14,14 @@ export function renderSources(container: HTMLElement, headerControls?: HTMLEleme
                     view.listContainer.innerHTML = `<div style="color: var(--text-secondary);">No sources found.</div>`;
                 } else {
                     view.listContainer.innerHTML = sources.map(s => {
-                        const styleStr = getSourceBadgeStyle(s.name || '');
+                        const badgeStyle = getSourceBadgeStyle(s.name || '');
                         return `
                         <div class="list-item">
                             <div>
-                                <div class="list-item-title">
-                                    ${s.name}
+                                <div class="list-item-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span class="badge" style="${badgeStyle}">${s.name}</span>
                                 </div>
-                                <div class="list-item-meta">
-                                    Source: <span class="badge" style="${styleStr}">${s.name}</span>
-                                </div>
+                                <div class="list-item-meta">${s.base_path || ''}</div>
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 ${s.can_resume ? `<span class="badge" title="This source supports continuous conversation history">Resumable</span>` : ''}

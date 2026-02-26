@@ -53,8 +53,6 @@ export function renderThemes(container: HTMLElement, headerControls?: HTMLElemen
                             </div>
                         `;
 
-
-
                         const previewWrapper = document.createElement('div');
                         previewWrapper.id = `theme-preview-${i}`;
                         previewWrapper.style.display = 'none';

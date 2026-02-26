@@ -102,8 +102,8 @@ export function renderDashboard(container: HTMLElement, _headerControls?: HTMLEl
     .then((stats: any) => {
       if (!statsEl) return;
 
-      const topTools = Object.entries(stats.tool_usage || {})
-        .sort(([, a]: any, [, b]: any) => b - a)
+      const topTools = (stats.top_tools || [])
+        .sort((a: any, b: any) => (b.count || 0) - (a.count || 0))
         .slice(0, 10);
 
       statsEl.innerHTML = `
@@ -116,16 +116,16 @@ export function renderDashboard(container: HTMLElement, _headerControls?: HTMLEl
                 ${topTools.length > 0 ? `
                     <div style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Top Tools Used</div>
                     <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                        ${topTools.map(([tool, count]: any) => {
-        const max = topTools[0][1] as number;
-        const pct = Math.round((count / max) * 100);
+                        ${topTools.map((tool: any, _idx: number) => {
+        const max = (topTools[0] as any).count || 1;
+        const pct = Math.round(((tool.count || 0) / max) * 100);
         return `
                                 <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <div style="font-size: 0.85rem; font-family: 'IBM Plex Mono', monospace; min-width: 180px; color: var(--text-primary);">${tool}</div>
+                                    <div style="font-size: 0.85rem; font-family: 'IBM Plex Mono', monospace; min-width: 180px; color: var(--text-primary);">${tool.name}</div>
                                     <div style="flex: 1; background: var(--border-color); border-radius: 999px; height: 8px; overflow: hidden;">
                                         <div style="background: var(--accent-color); width: ${pct}%; height: 100%; border-radius: 999px;"></div>
                                     </div>
-                                    <div style="font-size: 0.8rem; color: var(--text-secondary); min-width: 50px; text-align: right;">${formatNumber(count)}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary); min-width: 50px; text-align: right;">${formatNumber(tool.count)}</div>
                                 </div>
                             `;
       }).join('')}
