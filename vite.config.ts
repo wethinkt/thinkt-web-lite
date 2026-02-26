@@ -3,7 +3,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   base: './',
   server: {
-    port: 3001,
+    port: 7435,
     proxy: {
       '/api': {
         target: 'http://localhost:8784',
