@@ -66,13 +66,13 @@ body {
     background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 100%);
     display: flex;
     flex-direction: column;
-    padding: 1.5rem 1rem;
+    padding: 1rem 0.75rem;
 }
 
 .sidebar-header {
     font-size: 1.25rem;
     font-weight: 600;
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
     padding: 0 0.5rem;
     display: flex;
     align-items: center;
@@ -86,7 +86,7 @@ body {
 }
 
 .nav-item {
-    padding: 0.75rem 1rem;
+    padding: 0.5rem 0.75rem;
     border-radius: 6px;
     cursor: pointer;
     color: var(--text-secondary);
@@ -132,7 +132,7 @@ body {
 }
 
 .header {
-    padding: 1rem 1.5rem;
+    padding: 0.65rem 1.25rem;
     border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
@@ -142,7 +142,7 @@ body {
 
 .view-container {
     flex: 1;
-    padding: 1.25rem;
+    padding: 0.85rem;
     overflow-y: auto;
 }
 
@@ -151,13 +151,13 @@ body {
     background-color: var(--panel-bg);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 1.25rem;
-    margin-bottom: 1.25rem;
+    padding: 0.85rem;
+    margin-bottom: 0.85rem;
 }
 
 h2 {
     font-size: 1.15rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.65rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -168,7 +168,7 @@ h2 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem 0.5rem;
+    padding: 0.5rem 0.4rem;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -192,7 +192,7 @@ h2 {
 /* Badges */
 .badge {
     font-size: 0.75rem;
-    padding: 0.15rem 0.5rem;
+    padding: 0.1rem 0.4rem;
     border-radius: 999px;
     font-weight: 500;
     background-color: var(--border-color);
@@ -284,7 +284,7 @@ h2 {
 /* Inputs */
 .input {
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.5rem 0.65rem;
     border: 1px solid var(--border-color);
     border-radius: 6px;
     background-color: var(--bg-color);

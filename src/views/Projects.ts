@@ -73,7 +73,6 @@ export function renderProjects(container: HTMLElement, _headerControls?: HTMLEle
     ]).then(([projects, appsData, sources]) => {
         const merged = mergeProjects(projects);
         const apps = appsData.apps || [];
-        const defaultTerminal = appsData.default_terminal;
 
         // Build set of resumable source names
         const resumableSources = new Set<string>();
@@ -109,19 +108,6 @@ export function renderProjects(container: HTMLElement, _headerControls?: HTMLEle
                 return;
             }
 
-            // Prepare terminal badges upfront
-            const terminalApps = apps.filter((app: any) => app.terminal && app.enabled !== false);
-            const terminalBadgesHTML = terminalApps.map((app: any) => {
-                const isDefault = app.id === defaultTerminal;
-                const styleStr = isDefault
-                    ? `background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24; display:flex; align-items:center; gap: 0.2rem;`
-                    : `background: rgba(20, 184, 166, 0.12); border: 1px solid rgba(20, 184, 166, 0.35); color: #2dd4bf;`;
-
-                const title = isDefault ? `title="Default Terminal"` : `title="Terminal App"`;
-                const icon = isDefault ? `<span style="font-size: 0.65rem;">★</span>` : '';
-                return `<span class="badge" style="${styleStr}" ${title}>_>${app.name}${icon}</span>`;
-            }).join('');
-
             view.listContainer.innerHTML = sorted.map((p, i) => {
                 const copyId = `copy-${i}`;
                 const selectId = `open-in-${i}`;
@@ -151,23 +137,22 @@ export function renderProjects(container: HTMLElement, _headerControls?: HTMLEle
                             <div class="list-item-title" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                                 ${p.name || 'Unnamed Project'}
                                 ${badges}
-                                ${terminalBadgesHTML}
                             </div>
                             <div class="list-item-meta" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem;">
                                 <span style="font-family: 'IBM Plex Mono', monospace;">${p.path}</span>
                                 <button id="${copyId}" class="btn btn-secondary btn-sm" style="padding: 0.1rem 0.4rem; font-size: 0.7rem;" title="Copy path">📋</button>
-                                ${timeStr ? `<span style="opacity: 0.6; font-size: 0.8rem;">· ${timeStr}</span>` : ''}
                             </div>
                         </div>
-                        ${hasOptions ? `
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            ${timeStr ? `<span style="opacity: 0.5; font-size: 0.75rem; white-space: nowrap;">${timeStr}</span>` : ''}
+                            ${hasOptions ? `
                                 <select id="${selectId}" class="input">
                                     <option value="">Open in...</option>
                                     ${enabledApps.map((app: any) => `<option value="${app.id}">${app.name}</option>`).join('')}
                                     ${resumeOptions}
                                 </select>
-                            </div>
-                        ` : ''}
+                            ` : ''}
+                        </div>
                     </div>
                 `;
             }).join('');
