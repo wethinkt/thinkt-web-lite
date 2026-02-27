@@ -1,74 +1,104 @@
 # thinkt-web-lite
 
-Lightweight web dashboard for [go-thinkt](https://github.com/wethinkt/go-thinkt) when the user invokes `thinkt server lite`. 
+Lightweight web dashboard for [go-thinkt](https://github.com/wethinkt/go-thinkt), used by `thinkt server lite`.
 
-Vanilla HTML/CSS/JS — no build tools, no dependencies.
+This project now uses a small Vite + TypeScript build pipeline and is shipped as static assets.
+
+## Stack
+
+- TypeScript + Vite
+- No framework
+- Same-origin API calls to `/api/v1/...`
+- Embedded in go-thinkt as a git submodule at `internal/server/web-lite/`
 
 ## Structure
 
+```txt
+index.html              Vite entry HTML
+src/main.ts             App shell + navigation + language selector
+src/views/*             Dashboard views
+src/components/*        Shared UI pieces (JSON viewer, theme preview)
+src/i18n.ts             Runtime i18n catalogs + locale persistence
+src/style.css           Global styles
+dist/                   Production build output
+static/                 Legacy static assets (not the main app runtime)
 ```
-index.html        Main application (HTML + inline JS)
-static/style.css  Styles (dark/light themes, responsive)
-static/i18n.js    Internationalization (English, Spanish, Chinese)
-```
+
+## Internationalization
+
+The UI supports:
+
+- English (`en`)
+- Spanish (`es`)
+- Chinese (`zh`)
+
+Locale behavior:
+
+- Browser locale auto-detection on first load
+- Selection persisted in `localStorage` (`thinkt-lite-locale`)
+- Language can be changed from the sidebar selector
 
 ## Development
 
-This repo is used as a git submodule inside go-thinkt at `internal/server/web-lite/`.
+Install dependencies:
 
-### Fresh clone
+```sh
+npm install
+```
+
+Run the app in dev mode (proxies `/api` to local go-thinkt):
+
+```sh
+npm run dev
+```
+
+Other scripts:
+
+```sh
+npm run lint
+npm run typecheck
+npm run build
+npm run ci:check
+```
+
+## Submodule Workflow
+
+This repo is consumed by go-thinkt as a submodule.
+
+Fresh clone of go-thinkt:
 
 ```sh
 git clone --recurse-submodules https://github.com/wethinkt/go-thinkt
 ```
 
-### Existing clone (init submodules)
+If submodules are missing:
 
 ```sh
 cd go-thinkt
 git submodule update --init --recursive
 ```
 
-### Workflow
+After committing changes here, update the submodule ref in go-thinkt:
 
-1. Run the go-thinkt server — `thinkt server lite` — it serves the webapp on the same origin.
-2. Edit files in `internal/server/web-lite/`. Changes are picked up on rebuild.
-3. Commit and push from inside the submodule directory.
-4. Back in the go-thinkt root, stage the updated submodule ref and commit:
-   ```sh
-   git add internal/server/web-lite
-   git commit -m "update web-lite submodule"
-   ```
+```sh
+cd /path/to/go-thinkt
+git add internal/server/web-lite
+git commit -m "update web-lite submodule"
+```
 
-## Embedding
-
-The Go project embeds this directory via `//go:embed`. The webapp always calls APIs on the same origin — there is no configurable API base URL.
-
-## API Endpoints
-
-The dashboard consumes these go-thinkt API routes:
+## API Endpoints Used
 
 | Endpoint | Description |
 |---|---|
-| `GET /api/v1/sources` | List data sources (Claude, Kimi, Gemini, Copilot, Codex, Qwen) |
-| `GET /api/v1/projects` | List projects with session counts |
-| `GET /api/v1/open-in/apps` | List available apps for opening projects |
-| `GET /api/v1/themes` | List available themes |
+| `GET /api/v1/sources` | List data sources |
+| `GET /api/v1/projects` | List projects |
+| `GET /api/v1/open-in/apps` | List available "open in" apps |
+| `GET /api/v1/themes` | List themes |
+| `GET /api/v1/stats` | Usage statistics |
+| `GET /api/v1/info` | Server info |
+| `GET /api/v1/indexer/status` | Indexer status |
 | `POST /api/v1/open-in` | Open a project in an app |
-
-## Features
-
-- Project aggregation across multiple AI sources
-- Source visibility filtering
-- Open-in-app dropdown (configurable via go-thinkt)
-- Dark/light theme with system preference detection
-- i18n: English, Spanish, Chinese
-- Connection status monitoring
-- API response viewer modal
-- Responsive layout (mobile breakpoint at 700px)
 
 ## License
 
-Created with :heart: and :fire: by the team at [Neomantra](https://www.neomantra.net) and [BrainSTM](https://brain-stm.org).
-
-Released under the MIT License - see [LICENSE.txt](./LICENSE.txt)
+Released under the MIT License - see [LICENSE.txt](./LICENSE.txt).
