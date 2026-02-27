@@ -1,127 +1,151 @@
-// src/main.ts
 import './style.css';
 import { renderProjects } from './views/Projects';
 import { renderSources } from './views/Sources';
 import { renderDashboard } from './views/Dashboard';
 import { renderApps } from './views/Apps';
 import { renderThemes } from './views/Themes';
+import { LOCALE_LABELS, SUPPORTED_LOCALES, type SupportedLocale, getLocale, initI18n, setLocale, t } from './i18n';
 
 const app = document.getElementById('app');
+type ViewName = 'dashboard' | 'projects' | 'sources' | 'apps' | 'themes';
 
-if (app) {
+const views: Record<ViewName, { icon: string; labelKey: string; render: (container: HTMLElement, headerControls?: HTMLElement | null) => void }> = {
+  dashboard: { icon: '📊', labelKey: 'nav.dashboard', render: renderDashboard },
+  projects: { icon: '📁', labelKey: 'nav.projects', render: renderProjects },
+  sources: { icon: '🔌', labelKey: 'nav.sources', render: renderSources },
+  apps: { icon: '🧩', labelKey: 'nav.apps', render: renderApps },
+  themes: { icon: '🎨', labelKey: 'nav.themes', render: renderThemes },
+};
+
+let currentView: ViewName = 'dashboard';
+
+function isViewName(value: string): value is ViewName {
+  return value in views;
+}
+
+function isSupportedLocale(value: string): value is SupportedLocale {
+  return (SUPPORTED_LOCALES as readonly string[]).includes(value);
+}
+
+function switchView(viewName: string): void {
+  const nextView: ViewName = isViewName(viewName) ? viewName : 'dashboard';
+  currentView = nextView;
+
+  const viewTitle = document.getElementById('view-title');
+  const viewContainer = document.getElementById('view-container');
+  const headerControls = document.getElementById('header-controls');
+
+  if (!viewTitle || !viewContainer) return;
+
+  if (headerControls) {
+    headerControls.innerHTML = '';
+  }
+
+  const navItems = document.querySelectorAll<HTMLElement>('.nav-item[data-view]');
+  navItems.forEach((item) => {
+    item.classList.toggle('active', item.getAttribute('data-view') === nextView);
+  });
+
+  const viewInfo = views[nextView];
+  const viewLabel = t(viewInfo.labelKey);
+  viewTitle.textContent = viewLabel;
+  document.title = `${viewLabel} - ${t('document.title')}`;
+
+  viewContainer.innerHTML = '';
+  viewInfo.render(viewContainer, headerControls);
+}
+
+function renderShell(): void {
+  if (!app) return;
+
+  const navItems = Object.entries(views)
+    .map(([viewName, view]) => `
+      <div class="nav-item${viewName === currentView ? ' active' : ''}" data-view="${viewName}">
+        <span class="icon">${view.icon}</span> ${t(view.labelKey)}
+      </div>
+    `)
+    .join('');
+
+  const languageOptions = SUPPORTED_LOCALES
+    .map((locale) => `<option value="${locale}"${locale === getLocale() ? ' selected' : ''}>${LOCALE_LABELS[locale]}</option>`)
+    .join('');
+
   app.innerHTML = `
     <nav class="sidebar">
       <div class="sidebar-header">
         <a href="https://wethinkt.com" target="_blank" rel="noopener" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 0.4rem; font-family: 'IBM Plex Mono', monospace; font-size: 1.1rem; font-weight: 500;">
-          <span class="icon">🧠</span> thinkt lite
+          <span class="icon">🧠</span> ${t('app.title')}
         </a>
       </div>
       <div class="nav-menu">
-        <div class="nav-item active" data-view="dashboard">
-          <span class="icon">📊</span> Dashboard
-        </div>
-        <div class="nav-item" data-view="projects">
-          <span class="icon">📁</span> Projects
-        </div>
-        <div class="nav-item" data-view="sources">
-          <span class="icon">🔌</span> Sources
-        </div>
-        <div class="nav-item" data-view="apps">
-          <span class="icon">🧩</span> Apps
-        </div>
-        <div class="nav-item" data-view="themes">
-          <span class="icon">🎨</span> Themes
-        </div>
+        ${navItems}
         <a href="/swagger/index.html" target="_blank" rel="noopener" class="nav-item" style="text-decoration: none;">
-          <span class="icon">📚</span> API Docs
+          <span class="icon">📚</span> ${t('nav.apiDocs')}
           <span style="margin-left: auto; font-size: 0.8rem; opacity: 0.7;">↗</span>
         </a>
       </div>
-      <div class="theme-toggle" id="theme-toggle">
-        <span class="icon">🌓</span> Toggle Theme
+      <div class="sidebar-footer">
+        <div class="language-picker">
+          <label for="lang-select" class="language-label">${t('language.label')}</label>
+          <select id="lang-select" class="input language-select">${languageOptions}</select>
+        </div>
+        <button class="theme-toggle" id="theme-toggle" type="button">
+          <span class="icon">🌓</span> ${t('action.toggleTheme')}
+        </button>
       </div>
     </nav>
     <main class="main-content">
       <header class="header">
-        <h1 id="view-title">Dashboard</h1>
+        <h1 id="view-title"></h1>
         <div id="header-controls"></div>
       </header>
-      <div class="view-container" id="view-container">
-        <!-- Content injected here -->
-      </div>
+      <div class="view-container" id="view-container"></div>
     </main>
   `;
 
-  const navItems = document.querySelectorAll('.nav-item');
-  const viewTitle = document.getElementById('view-title');
-  const viewContainer = document.getElementById('view-container');
+  const shellNavItems = document.querySelectorAll<HTMLElement>('.nav-item[data-view]');
+  shellNavItems.forEach((item) => {
+    item.addEventListener('click', () => {
+      const viewName = item.getAttribute('data-view');
+      if (viewName) {
+        switchView(viewName);
+      }
+    });
+  });
+
   const themeToggle = document.getElementById('theme-toggle');
-
-  // Theme support
-  if (localStorage.getItem('theme') === 'light') {
-    document.body.classList.add('light-mode');
-  }
-
   themeToggle?.addEventListener('click', () => {
     document.body.classList.toggle('light-mode');
     const isLight = document.body.classList.contains('light-mode');
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
   });
 
-  // View switching logic
-  function switchView(viewName: string) {
-    if (!viewTitle || !viewContainer) return;
+  const langSelect = document.getElementById('lang-select');
+  if (langSelect instanceof HTMLSelectElement) {
+    langSelect.addEventListener('change', () => {
+      const next = langSelect.value;
+      if (!isSupportedLocale(next)) return;
 
-    const headerControls = document.getElementById("header-controls");
-    if (headerControls) headerControls.innerHTML = "";
-
-    // Update active nav
-    navItems.forEach(item => {
-      item.classList.remove('active');
-      if (item.getAttribute('data-view') === viewName) {
-        item.classList.add('active');
-        viewTitle.textContent = item.textContent?.trim() || viewName;
-      }
+      setLocale(next);
+      renderShell();
+      switchView(currentView);
     });
+  }
+}
 
-    // Render content
-    viewContainer.innerHTML = '';
-
-    switch (viewName) {
-      case 'dashboard':
-        renderDashboard(viewContainer, headerControls);
-        break;
-      case 'projects':
-        renderProjects(viewContainer, headerControls);
-        break;
-      case 'sources':
-        renderSources(viewContainer, headerControls);
-        break;
-      case 'apps':
-        renderApps(viewContainer, headerControls);
-        break;
-      case 'themes':
-        renderThemes(viewContainer, headerControls);
-        break;
-      default:
-        viewContainer.innerHTML = `<div class="error">View "${viewName}" not implemented yet</div>`;
-    }
+if (app) {
+  initI18n();
+  if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light-mode');
   }
 
-  // Handle nav clicks
-  navItems.forEach(item => {
-    item.addEventListener('click', () => {
-      const viewName = item.getAttribute('data-view');
-      if (viewName) switchView(viewName);
-    });
-  });
-
-  // Global event listener for programmatic navigation
   document.addEventListener('navigate', (e: Event) => {
     const customEvent = e as CustomEvent<string>;
-    switchView(customEvent.detail);
+    if (typeof customEvent.detail === 'string') {
+      switchView(customEvent.detail);
+    }
   });
 
-  // Initialize
+  renderShell();
   switchView('dashboard');
 }

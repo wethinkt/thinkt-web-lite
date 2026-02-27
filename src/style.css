@@ -85,6 +85,30 @@ body {
     gap: 0.25rem;
 }
 
+.sidebar-footer {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0 0.5rem;
+}
+
+.language-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.language-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.language-picker select.language-select {
+    width: 100%;
+}
+
 .nav-item {
     padding: 0.5rem 0.75rem;
     border-radius: 6px;
@@ -108,7 +132,7 @@ body {
 }
 
 .theme-toggle {
-    margin-top: auto;
+    width: 100%;
     padding: 0.75rem 1rem;
     cursor: pointer;
     color: var(--text-secondary);
@@ -116,6 +140,12 @@ body {
     align-items: center;
     gap: 0.5rem;
     transition: color 0.2s;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: transparent;
+    text-align: left;
+    font-family: inherit;
+    font-size: 0.9rem;
 }
 
 .theme-toggle:hover {

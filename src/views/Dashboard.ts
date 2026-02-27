@@ -1,21 +1,27 @@
-// src/views/Dashboard.ts
 import { apiClient } from '../api';
+import { getLocale, t } from '../i18n';
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
 
 function formatNumber(num?: number): string {
-  if (num === undefined) return '—';
-  return num.toLocaleString();
+  if (num === undefined) return t('common.notAvailable');
+  return num.toLocaleString(getLocale());
 }
 
 function formatUptime(seconds?: number): string {
-  if (seconds === undefined) return '—';
-  if (seconds < 60) return `${seconds}s`;
+  if (seconds === undefined) return t('common.notAvailable');
+  if (seconds < 60) return t('time.secondsShort', { count: seconds });
+
   const hrs = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
-  if (hrs > 0) return `${hrs}h ${mins}m`;
-  return `${mins}m`;
+  if (hrs > 0) return t('time.hoursMinutesShort', { hours: hrs, minutes: mins });
+  return t('time.minutesShort', { count: mins });
 }
 
-function statCard(icon: string, label: string, value: string | number, subtext?: string, flex: string = '1') {
+function statCard(icon: string, label: string, value: string | number, subtext?: string, flex = '1'): string {
   return `
         <div style="flex: ${flex}; min-width: 150px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.85rem; font-weight: 500;">
@@ -27,7 +33,7 @@ function statCard(icon: string, label: string, value: string | number, subtext?:
     `;
 }
 
-function labeledProgressBar(label: string, done?: number, total?: number) {
+function labeledProgressBar(label: string, done?: number, total?: number): string {
   if (done === undefined || total === undefined || total <= 0) return '';
   const pct = Math.min(100, Math.round((done / total) * 100));
   return `
@@ -43,39 +49,34 @@ function labeledProgressBar(label: string, done?: number, total?: number) {
     `;
 }
 
-export function renderDashboard(container: HTMLElement, _headerControls?: HTMLElement | null) {
+export function renderDashboard(container: HTMLElement, _headerControls?: HTMLElement | null): void {
   container.innerHTML = `
-    <!-- Connection Status -->
     <div class="panel">
       <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 style="margin-bottom: 0;"><span class="icon">⚡</span> System Status</h2>
-        <div id="dashboard-connection" class="loading" style="font-size: 0.9rem;">Connecting…</div>
+        <h2 style="margin-bottom: 0;"><span class="icon">⚡</span> ${t('dashboard.systemStatus')}</h2>
+        <div id="dashboard-connection" class="loading" style="font-size: 0.9rem;">${t('dashboard.connecting')}</div>
       </div>
     </div>
 
-    <!-- Stats Cards -->
     <div class="panel">
-      <h2><span class="icon">📊</span> Usage Statistics</h2>
-      <div id="dashboard-stats" class="loading">Loading stats…</div>
+      <h2><span class="icon">📊</span> ${t('dashboard.usageStatistics')}</h2>
+      <div id="dashboard-stats" class="loading">${t('dashboard.loadingStats')}</div>
     </div>
 
-    <!-- Server Info -->
     <div class="panel">
-      <h2><span class="icon">🖥️</span> Server Information</h2>
-      <div id="dashboard-server-info" class="loading">Loading server info…</div>
+      <h2><span class="icon">🖥️</span> ${t('dashboard.serverInformation')}</h2>
+      <div id="dashboard-server-info" class="loading">${t('dashboard.loadingServerInfo')}</div>
     </div>
 
-    <!-- Indexer Status -->
     <div class="panel">
-      <h2><span class="icon">🔄</span> Indexer Status</h2>
-      <div id="dashboard-indexer" class="loading">Loading indexer status…</div>
+      <h2><span class="icon">🔄</span> ${t('dashboard.indexerStatus')}</h2>
+      <div id="dashboard-indexer" class="loading">${t('dashboard.loadingIndexerStatus')}</div>
     </div>
 
-    <!-- About -->
     <div class="panel">
-      <h2><span class="icon">ℹ️</span> About Thinkt Web Lite</h2>
+      <h2><span class="icon">ℹ️</span> ${t('dashboard.aboutTitle')}</h2>
       <p style="color: var(--text-secondary); line-height: 1.6;">
-        Developer-oriented diagnostic tool for the Thinkt API. Monitor projects, verify sources, inspect indexer health, and test API endpoints.
+        ${t('dashboard.aboutBody')}
       </p>
       <p style="margin-top: 0.5rem;">
         <a href="https://github.com/wethinkt/go-thinkt" target="_blank" rel="noopener" style="color: var(--accent-color); font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem;">github.com/wethinkt/go-thinkt</a>
@@ -88,23 +89,20 @@ export function renderDashboard(container: HTMLElement, _headerControls?: HTMLEl
   const serverInfoEl = document.getElementById('dashboard-server-info');
   const indexerEl = document.getElementById('dashboard-indexer');
 
-  // --- Connection Status ---
   apiClient.getSources()
     .then(() => {
       if (connEl) {
         connEl.classList.remove('loading');
-        connEl.innerHTML = `<span class="source-status online">Online</span>`;
+        connEl.innerHTML = `<span class="source-status online">${t('status.online')}</span>`;
       }
     })
-    .catch(err => {
+    .catch((err: unknown) => {
       if (connEl) {
         connEl.classList.remove('loading');
-        connEl.innerHTML = `<span class="source-status offline" title="${err.message}">Offline</span>`;
+        connEl.innerHTML = `<span class="source-status offline" title="${getErrorMessage(err)}">${t('status.offline')}</span>`;
       }
     });
 
-  // --- Stats ---
-  // Ensure we use the exact shape since ThinktClient currently bypasses adapters for getStats
   apiClient.getStats()
     .then((stats: any) => {
       if (!statsEl) return;
@@ -115,15 +113,15 @@ export function renderDashboard(container: HTMLElement, _headerControls?: HTMLEl
 
       statsEl.innerHTML = `
                 <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
-                    ${statCard('💬', 'Sessions', formatNumber(stats.total_sessions))}
-                    ${statCard('📁', 'Projects', formatNumber(stats.total_projects))}
-                    ${statCard('📝', 'Entries', formatNumber(stats.total_entries))}
-                    ${statCard('🪙', 'Total Tokens', formatNumber(stats.total_tokens))}
+                    ${statCard('💬', t('dashboard.sessions'), formatNumber(stats.total_sessions))}
+                    ${statCard('📁', t('dashboard.projects'), formatNumber(stats.total_projects))}
+                    ${statCard('📝', t('dashboard.entries'), formatNumber(stats.total_entries))}
+                    ${statCard('🪙', t('dashboard.totalTokens'), formatNumber(stats.total_tokens))}
                 </div>
                 ${topTools.length > 0 ? `
-                    <div style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Top Tools Used</div>
+                    <div style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">${t('dashboard.topToolsUsed')}</div>
                     <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                        ${topTools.map((tool: any, _idx: number) => {
+                        ${topTools.map((tool: any) => {
         const max = (topTools[0] as any).count || 1;
         const pct = Math.round(((tool.count || 0) / max) * 100);
         return `
@@ -140,29 +138,29 @@ export function renderDashboard(container: HTMLElement, _headerControls?: HTMLEl
                 ` : ''}
             `;
     })
-    .catch(err => {
-      if (statsEl) statsEl.innerHTML = `<div class="error">Failed to load stats: ${err.message}</div>`;
+    .catch((err: unknown) => {
+      if (statsEl) statsEl.innerHTML = `<div class="error">${t('dashboard.failedToLoadStats', { message: getErrorMessage(err) })}</div>`;
     });
 
-  // --- Server Info ---
   apiClient.getInfo()
     .then((info: any) => {
       if (!serverInfoEl) return;
 
       serverInfoEl.innerHTML = `
                 <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
-                    ${statCard('🏷️', 'Version', info.version || '—', info.revision ? `<span style="font-family: 'IBM Plex Mono', monospace;">${info.revision.substring(0, 7)}</span>` : undefined, '2')}
-                    ${statCard('⏱', 'Uptime', formatUptime(info.uptime_seconds))}
-                    ${statCard('🔑', 'Auth', info.authenticated ? 'Enabled' : 'Disabled')}
-                    ${statCard('⚙️', 'PID', info.pid || '—')}
+                    ${statCard('🏷️', t('dashboard.version'), info.version || t('common.notAvailable'), info.revision ? `<span style="font-family: 'IBM Plex Mono', monospace;">${info.revision.substring(0, 7)}</span>` : undefined, '2')}
+                    ${statCard('⏱', t('dashboard.uptime'), formatUptime(info.uptime_seconds))}
+                    ${statCard('🔑', t('dashboard.auth'), info.authenticated ? t('common.enabled') : t('common.disabled'))}
+                    ${statCard('⚙️', t('dashboard.pid'), info.pid || t('common.notAvailable'))}
                 </div>
             `;
     })
-    .catch((err: any) => {
-      if (serverInfoEl) serverInfoEl.innerHTML = `<div style="color: var(--text-secondary);">Server info unavailable: ${err.message}</div>`;
+    .catch((err: unknown) => {
+      if (serverInfoEl) {
+        serverInfoEl.innerHTML = `<div style="color: var(--text-secondary);">${t('dashboard.serverInfoUnavailable', { message: getErrorMessage(err) })}</div>`;
+      }
     });
 
-  // --- Indexer Status ---
   apiClient.getIndexerStatus()
     .then((status: any) => {
       if (!indexerEl) return;
@@ -171,40 +169,42 @@ export function renderDashboard(container: HTMLElement, _headerControls?: HTMLEl
       const sync = status.sync_progress;
       const embed = status.embed_progress;
 
-      const syncProjectBar = labeledProgressBar('Projects', sync?.project, sync?.project_total);
-      const syncSessionBar = labeledProgressBar('Sessions', sync?.done, sync?.total);
-      const embedSessionBar = labeledProgressBar('Sessions', embed?.done, embed?.total);
-      const embedChunkBar = labeledProgressBar('Chunks', embed?.chunks_done, embed?.chunks_total);
+      const syncProjectBar = labeledProgressBar(t('dashboard.projects'), sync?.project, sync?.project_total);
+      const syncSessionBar = labeledProgressBar(t('dashboard.sessions'), sync?.done, sync?.total);
+      const embedSessionBar = labeledProgressBar(t('dashboard.sessions'), embed?.done, embed?.total);
+      const embedChunkBar = labeledProgressBar(t('dashboard.chunks'), embed?.chunks_done, embed?.chunks_total);
 
       indexerEl.innerHTML = `
                 <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
-                    ${statCard('🧠', 'Model', status.model || '—', status.model_dim ? `${status.model_dim}d` : undefined, '2')}
-                    ${statCard('⏱', 'Uptime', formatUptime(status.uptime_seconds))}
-                    ${statCard('📡', 'Watching', status.watching ? 'Yes' : 'No')}
-                    ${statCard('⚙️', 'State', '', `<span style="color: ${stateColor}; font-size: 0.9rem; font-weight: 600;">${status.state || (status.running ? 'Running' : 'Idle')}</span>`)}
+                    ${statCard('🧠', t('dashboard.model'), status.model || t('common.notAvailable'), status.model_dim ? `${status.model_dim}d` : undefined, '2')}
+                    ${statCard('⏱', t('dashboard.uptime'), formatUptime(status.uptime_seconds))}
+                    ${statCard('📡', t('dashboard.watching'), status.watching ? t('common.yes') : t('common.no'))}
+                    ${statCard('⚙️', t('dashboard.state'), '', `<span style="color: ${stateColor}; font-size: 0.9rem; font-weight: 600;">${status.state || (status.running ? t('dashboard.running') : t('dashboard.idle'))}</span>`)}
                 </div>
 
                 ${sync ? `
                     <div style="margin-bottom: 1rem;">
-                        <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Sync Progress</div>
+                        <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">${t('dashboard.syncProgress')}</div>
                         ${sync.message ? `<div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem;">${sync.message}</div>` : ''}
-                        ${syncProjectBar || syncSessionBar ? `${syncProjectBar}${syncSessionBar}` : labeledProgressBar('Sessions', sync.done, sync.total)}
-                        ${sync.project_name ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">Project: ${sync.project_name}</div>` : ''}
+                        ${syncProjectBar || syncSessionBar ? `${syncProjectBar}${syncSessionBar}` : labeledProgressBar(t('dashboard.sessions'), sync.done, sync.total)}
+                        ${sync.project_name ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">${t('dashboard.project', { name: sync.project_name })}</div>` : ''}
                     </div>
                 ` : ''}
 
                 ${embed ? `
                     <div>
-                        <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Embedding Progress</div>
+                        <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">${t('dashboard.embeddingProgress')}</div>
                         ${embed.message ? `<div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem;">${embed.message}</div>` : ''}
-                        ${embedSessionBar || embedChunkBar ? `${embedSessionBar}${embedChunkBar}` : labeledProgressBar('Sessions', embed.done, embed.total)}
+                        ${embedSessionBar || embedChunkBar ? `${embedSessionBar}${embedChunkBar}` : labeledProgressBar(t('dashboard.sessions'), embed.done, embed.total)}
                     </div>
                 ` : ''}
 
-                ${!sync && !embed ? `<div style="color: var(--text-secondary); font-size: 0.875rem;">No active sync or embedding in progress.</div>` : ''}
+                ${!sync && !embed ? `<div style="color: var(--text-secondary); font-size: 0.875rem;">${t('dashboard.noActiveSyncOrEmbedding')}</div>` : ''}
             `;
     })
-    .catch(err => {
-      if (indexerEl) indexerEl.innerHTML = `<div style="color: var(--text-secondary);">Indexer status unavailable: ${err.message}</div>`;
+    .catch((err: unknown) => {
+      if (indexerEl) {
+        indexerEl.innerHTML = `<div style="color: var(--text-secondary);">${t('dashboard.indexerStatusUnavailable', { message: getErrorMessage(err) })}</div>`;
+      }
     });
 }

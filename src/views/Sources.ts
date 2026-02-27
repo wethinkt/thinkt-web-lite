@@ -1,17 +1,18 @@
 // src/views/Sources.ts
 import { apiClient } from '../api';
 import { createJsonViewer } from '../components/JsonViewer';
+import { t } from '../i18n';
 import { getSourceBadgeStyle, createTabbedPanelView } from '../utils';
 
 export function renderSources(container: HTMLElement, headerControls?: HTMLElement | null) {
-    const view = createTabbedPanelView(container, headerControls, 'sources', 'Loading sources...');
+    const view = createTabbedPanelView(container, headerControls, 'sources', t('sources.loadingSources'));
 
     apiClient.getSources()
         .then(sources => {
             // Render nice UI
             if (view.listContainer) {
                 if (sources.length === 0) {
-                    view.listContainer.innerHTML = `<div style="color: var(--text-secondary);">No sources found.</div>`;
+                    view.listContainer.innerHTML = `<div style="color: var(--text-secondary);">${t('sources.noSourcesFound')}</div>`;
                 } else {
                     view.listContainer.innerHTML = sources.map(s => {
                         const badgeStyle = getSourceBadgeStyle(s.name || '');
@@ -24,8 +25,8 @@ export function renderSources(container: HTMLElement, headerControls?: HTMLEleme
                                 <div class="list-item-meta">${s.base_path || ''}</div>
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                ${s.can_resume ? `<span class="badge" title="This source supports continuous conversation history">Resumable</span>` : ''}
-                                <div class="source-status online">Online</div>
+                                ${s.can_resume ? `<span class="badge" title="${t('sources.resumableTooltip')}">${t('sources.resumable')}</span>` : ''}
+                                <div class="source-status online">${t('status.online')}</div>
                             </div>
                         </div>
                     `}).join('');
@@ -42,6 +43,6 @@ export function renderSources(container: HTMLElement, headerControls?: HTMLEleme
             }
         })
         .catch(err => {
-            view.setError(`Failed to load sources: ${err.message}`);
+            view.setError(t('sources.failedToLoadSources', { message: err.message }));
         });
 }

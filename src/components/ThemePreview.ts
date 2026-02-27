@@ -1,5 +1,6 @@
 // src/components/ThemePreview.ts
 import { ThemeColors } from '@wethinkt/ts-thinkt';
+import { t } from '../i18n';
 
 type ThemeStyle = { fg?: string; bg?: string };
 
@@ -33,7 +34,7 @@ export function createThemePreview(container: HTMLElement, colors: ThemeColors, 
             
             <!-- Preview Header -->
             <div style="padding: 0.5rem 0.75rem; background: ${c.border_active || 'var(--border-color)'}20; border-bottom: 2px solid ${c.border_active || 'var(--border-color)'}; font-size: 0.75rem; color: var(--text-secondary);">
-                Preview: ${themeName} ${c.accent ? `<span style="color:${c.accent};">●</span>` : ''}
+                ${t('themePreview.previewHeader', { themeName })} ${c.accent ? `<span style="color:${c.accent};">●</span>` : ''}
             </div>
 
             <!-- Simulated conversation -->
@@ -41,14 +42,14 @@ export function createThemePreview(container: HTMLElement, colors: ThemeColors, 
                 <!-- User turn -->
                 <div style="${blockStyle(c.user_block)}; padding: 0.5rem 0.75rem; border-radius: 6px; border-left: 3px solid ${c.accent || '#aaa'};">
                     <div style="${blockStyle(c.user_label)}; font-size: 0.7rem; margin-bottom: 0.25rem; font-weight: 600;">
-                        USER
+                        ${t('themePreview.userLabel')}
                     </div>
-                    <div style="${blockStyle(c.text_primary)};">Hello, can you help me?</div>
+                    <div style="${blockStyle(c.text_primary)};">${t('themePreview.userExample')}</div>
                 </div>
 
                 <!-- Assistant thinking indicator -->
                 <div style="display: flex; gap: 0.5rem; justify-content: center; margin: 0.25rem 0;">
-                    <div style="${blockStyle(c.thinking_label)}; font-size: 0.7rem;">&lt;thinking&gt;</div>
+                    <div style="${blockStyle(c.thinking_label)}; font-size: 0.7rem;">${t('themePreview.thinking')}</div>
                 </div>
 
                 <!-- Tool call -->
@@ -59,28 +60,28 @@ export function createThemePreview(container: HTMLElement, colors: ThemeColors, 
                 <!-- Assistant turn -->
                 <div style="${blockStyle(c.assistant_block)}; padding: 0.5rem 0.75rem; border-radius: 6px; margin-top: 0.25rem;">
                     <div style="${blockStyle(c.assistant_label)}; font-size: 0.7rem; margin-bottom: 0.25rem; font-weight: 600;">
-                        ASSISTANT
+                        ${t('themePreview.assistantLabel')}
                     </div>
                     <div style="${blockStyle(c.text_primary)};">
-                        I ran the code. The result is <span style="${blockStyle(c.text_secondary)};">42</span>.
+                        ${t('themePreview.assistantExample')} <span style="${blockStyle(c.text_secondary)};">42</span>.
                     </div>
                     <div style="${blockStyle(c.text_muted)}; font-size: 0.75rem; margin-top: 0.25rem;">
-                        (Took 0.3s)
+                        ${t('themePreview.tookSeconds', { seconds: '0.3' })}
                     </div>
                 </div>
             </div>
 
             <!-- Color Swatches Grid -->
             <div style="padding: 0.75rem; border-top: 1px solid var(--border-color); display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 1.5rem;">
-                ${c.accent ? swatch('accent', { fg: c.accent }) : ''}
-                ${swatch('user', c.user_label)}
-                ${swatch('assistant', c.assistant_label)}
-                ${swatch('tool', c.tool_label)}
-                ${swatch('thinking', c.thinking_label)}
-                ${swatch('text primary', c.text_primary)}
-                ${swatch('text secondary', c.text_secondary)}
-                ${swatch('text muted', c.text_muted)}
-                ${c.border_active ? swatch('border active', { fg: c.border_active }) : ''}
+                ${c.accent ? swatch(t('themePreview.swatchAccent'), { fg: c.accent }) : ''}
+                ${swatch(t('themePreview.swatchUser'), c.user_label)}
+                ${swatch(t('themePreview.swatchAssistant'), c.assistant_label)}
+                ${swatch(t('themePreview.swatchTool'), c.tool_label)}
+                ${swatch(t('themePreview.swatchThinking'), c.thinking_label)}
+                ${swatch(t('themePreview.swatchTextPrimary'), c.text_primary)}
+                ${swatch(t('themePreview.swatchTextSecondary'), c.text_secondary)}
+                ${swatch(t('themePreview.swatchTextMuted'), c.text_muted)}
+                ${c.border_active ? swatch(t('themePreview.swatchBorderActive'), { fg: c.border_active }) : ''}
             </div>
         </div>
     `;

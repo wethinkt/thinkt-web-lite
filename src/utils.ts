@@ -1,3 +1,5 @@
+import { t } from './i18n';
+
 export function downloadJson(filename: string, data: any) {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -62,12 +64,14 @@ export function createTabbedPanelView(
     container: HTMLElement,
     headerControls: HTMLElement | null | undefined,
     viewId: string,
-    loadingText: string = 'Loading...'
+    loadingText?: string
 ): TabbedView {
+    const resolvedLoadingText = loadingText ?? t('loading.default');
+
     container.innerHTML = `
         <div class="panel">
             <div id="${viewId}-rendered" class="tab-content active">
-                <div id="${viewId}-list" class="loading">${loadingText}</div>
+                <div id="${viewId}-list" class="loading">${resolvedLoadingText}</div>
             </div>
             <div id="${viewId}-raw" class="tab-content">
                 <div id="${viewId}-json-container"></div>
@@ -77,16 +81,16 @@ export function createTabbedPanelView(
 
     const tabsHtml = `
         <div class="tabs-header">
-            <button class="tab-btn active" data-target="${viewId}-rendered">Rendered</button>
-            <button class="tab-btn" data-target="${viewId}-raw">Raw JSON</button>
+            <button class="tab-btn active" data-target="${viewId}-rendered">${t('tabs.rendered')}</button>
+            <button class="tab-btn" data-target="${viewId}-raw">${t('tabs.rawJson')}</button>
         </div>
     `;
 
     if (headerControls) {
         headerControls.innerHTML = tabsHtml;
     } else {
-        const fallbackHeader = document.createElement("div");
-        fallbackHeader.style.cssText = "display: flex; justify-content: flex-end; margin-bottom: 1rem;";
+        const fallbackHeader = document.createElement('div');
+        fallbackHeader.style.cssText = 'display: flex; justify-content: flex-end; margin-bottom: 1rem;';
         fallbackHeader.innerHTML = tabsHtml;
         container.insertBefore(fallbackHeader, container.firstChild);
     }

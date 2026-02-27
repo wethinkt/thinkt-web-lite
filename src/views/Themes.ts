@@ -3,11 +3,12 @@ import { apiClient } from '../api';
 import { createJsonViewer } from '../components/JsonViewer';
 import { createThemePreview } from '../components/ThemePreview';
 import { ThemeInfo } from '@wethinkt/ts-thinkt';
+import { getLocale, t } from '../i18n';
 
 import { createTabbedPanelView } from '../utils';
 
 export function renderThemes(container: HTMLElement, headerControls?: HTMLElement | null) {
-    const view = createTabbedPanelView(container, headerControls, 'themes', 'Loading themes...');
+    const view = createTabbedPanelView(container, headerControls, 'themes', t('themes.loadingThemes'));
 
     apiClient.getThemes()
         .then(data => {
@@ -15,16 +16,16 @@ export function renderThemes(container: HTMLElement, headerControls?: HTMLElemen
                 // Active themes bubble to the top
                 if (a.active && !b.active) return -1;
                 if (!a.active && b.active) return 1;
-                return (a.name || '').localeCompare(b.name || '');
+                return (a.name || '').localeCompare(b.name || '', getLocale(), { sensitivity: 'base' });
             });
 
             if (view.listContainer) {
                 if (themes.length === 0) {
-                    view.listContainer.innerHTML = `<div style="color: var(--text-secondary);">No themes found.</div>`;
+                    view.listContainer.innerHTML = `<div style="color: var(--text-secondary);">${t('themes.noThemesFound')}</div>`;
                 } else {
                     view.listContainer.innerHTML = `
                         <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
-                            Preview the available themes from the connected Thinkt API.
+                            ${t('themes.previewDescription')}
                         </p>
                     `;
                     themes.forEach((theme, i) => {
@@ -42,9 +43,9 @@ export function renderThemes(container: HTMLElement, headerControls?: HTMLElemen
                         header.innerHTML = `
                             <div>
                                 <div class="list-item-title" style="display: flex; align-items: center; gap: 0.5rem;">
-                                    ${theme.name || 'Unnamed'}
-                                    ${theme.active ? '<span class="badge success">Active</span>' : ''}
-                                    ${theme.embedded ? '<span class="badge">Built-in</span>' : ''}
+                                    ${theme.name || t('themes.unnamed')}
+                                    ${theme.active ? `<span class="badge success">${t('themes.active')}</span>` : ''}
+                                    ${theme.embedded ? `<span class="badge">${t('themes.builtIn')}</span>` : ''}
                                 </div>
                                 ${theme.description ? `<div class="list-item-meta">${theme.description}</div>` : ''}
                             </div>
@@ -66,7 +67,7 @@ export function renderThemes(container: HTMLElement, headerControls?: HTMLElemen
 
                             // Lazy render the preview components only when opening the first time
                             if (isHidden && !previewRendered && theme.colors) {
-                                createThemePreview(previewWrapper, theme.colors, theme.name || 'Unnamed');
+                                createThemePreview(previewWrapper, theme.colors, theme.name || t('themes.unnamed'));
                                 previewRendered = true;
                             }
                         });
@@ -92,6 +93,6 @@ export function renderThemes(container: HTMLElement, headerControls?: HTMLElemen
             }
         })
         .catch((err: Error) => {
-            view.setError(`Failed to load themes: ${err.message}`);
+            view.setError(t('themes.failedToLoadThemes', { message: err.message }));
         });
 }
