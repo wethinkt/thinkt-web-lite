@@ -15,9 +15,9 @@ function formatUptime(seconds?: number): string {
   return `${mins}m`;
 }
 
-function statCard(icon: string, label: string, value: string | number, subtext?: string) {
+function statCard(icon: string, label: string, value: string | number, subtext?: string, flex: string = '1') {
   return `
-        <div style="flex: 1; min-width: 150px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
+        <div style="flex: ${flex}; min-width: 150px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.85rem; font-weight: 500;">
                 <span style="font-size: 1.1rem;">${icon}</span> ${label}
             </div>
@@ -27,14 +27,14 @@ function statCard(icon: string, label: string, value: string | number, subtext?:
     `;
 }
 
-function progressBar(done?: number, total?: number) {
-  if (done === undefined || total === undefined || total === 0) return '';
+function labeledProgressBar(label: string, done?: number, total?: number) {
+  if (done === undefined || total === undefined || total <= 0) return '';
   const pct = Math.min(100, Math.round((done / total) * 100));
   return `
-        <div style="margin-top: 0.5rem;">
+        <div style="margin-top: 0.75rem;">
             <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">
-                <span>${formatNumber(done)} / ${formatNumber(total)}</span>
-                <span>${pct}%</span>
+                <span style="font-weight: 500;">${label}</span>
+                <span>${formatNumber(done)} / ${formatNumber(total)} &nbsp; ${pct}%</span>
             </div>
             <div style="width: 100%; height: 6px; background: var(--border-color); border-radius: 999px; overflow: hidden;">
                 <div style="width: ${pct}%; height: 100%; background: var(--accent-color); border-radius: 999px;"></div>
@@ -151,7 +151,7 @@ export function renderDashboard(container: HTMLElement, _headerControls?: HTMLEl
 
       serverInfoEl.innerHTML = `
                 <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
-                    ${statCard('🏷️', 'Version', info.version || '—', info.revision ? `<span style="font-family: 'IBM Plex Mono', monospace;">${info.revision.substring(0, 7)}</span>` : undefined)}
+                    ${statCard('🏷️', 'Version', info.version || '—', info.revision ? `<span style="font-family: 'IBM Plex Mono', monospace;">${info.revision.substring(0, 7)}</span>` : undefined, '2')}
                     ${statCard('⏱', 'Uptime', formatUptime(info.uptime_seconds))}
                     ${statCard('🔑', 'Auth', info.authenticated ? 'Enabled' : 'Disabled')}
                     ${statCard('⚙️', 'PID', info.pid || '—')}
@@ -171,9 +171,14 @@ export function renderDashboard(container: HTMLElement, _headerControls?: HTMLEl
       const sync = status.sync_progress;
       const embed = status.embed_progress;
 
+      const syncProjectBar = labeledProgressBar('Projects', sync?.project, sync?.project_total);
+      const syncSessionBar = labeledProgressBar('Sessions', sync?.done, sync?.total);
+      const embedSessionBar = labeledProgressBar('Sessions', embed?.done, embed?.total);
+      const embedChunkBar = labeledProgressBar('Chunks', embed?.chunks_done, embed?.chunks_total);
+
       indexerEl.innerHTML = `
                 <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
-                    ${statCard('🧠', 'Model', status.model || '—', status.model_dim ? `${status.model_dim}d` : undefined)}
+                    ${statCard('🧠', 'Model', status.model || '—', status.model_dim ? `${status.model_dim}d` : undefined, '2')}
                     ${statCard('⏱', 'Uptime', formatUptime(status.uptime_seconds))}
                     ${statCard('📡', 'Watching', status.watching ? 'Yes' : 'No')}
                     ${statCard('⚙️', 'State', '', `<span style="color: ${stateColor}; font-size: 0.9rem; font-weight: 600;">${status.state || (status.running ? 'Running' : 'Idle')}</span>`)}
@@ -181,18 +186,18 @@ export function renderDashboard(container: HTMLElement, _headerControls?: HTMLEl
 
                 ${sync ? `
                     <div style="margin-bottom: 1rem;">
-                        <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem;">Sync Progress</div>
+                        <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Sync Progress</div>
                         ${sync.message ? `<div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem;">${sync.message}</div>` : ''}
-                        ${progressBar(sync.done, sync.total)}
-                        ${sync.project_name ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.35rem;">Project: ${sync.project_name}</div>` : ''}
+                        ${syncProjectBar || syncSessionBar ? `${syncProjectBar}${syncSessionBar}` : labeledProgressBar('Sessions', sync.done, sync.total)}
+                        ${sync.project_name ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">Project: ${sync.project_name}</div>` : ''}
                     </div>
                 ` : ''}
 
                 ${embed ? `
                     <div>
-                        <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem;">Embedding Progress</div>
+                        <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Embedding Progress</div>
                         ${embed.message ? `<div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem;">${embed.message}</div>` : ''}
-                        ${progressBar(embed.done, embed.total)}
+                        ${embedSessionBar || embedChunkBar ? `${embedSessionBar}${embedChunkBar}` : labeledProgressBar('Sessions', embed.done, embed.total)}
                     </div>
                 ` : ''}
 
