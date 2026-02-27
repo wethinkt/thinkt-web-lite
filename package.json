@@ -13,7 +13,7 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@wethinkt/ts-thinkt": "0.1.16",
+        "@wethinkt/ts-thinkt": "0.1.17",
         "eslint": "^10.0.2"
     },
     "author": "Neomantra Corp",

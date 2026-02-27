@@ -59,6 +59,12 @@ export function renderDashboard(container: HTMLElement, _headerControls?: HTMLEl
       <div id="dashboard-stats" class="loading">Loading stats…</div>
     </div>
 
+    <!-- Server Info -->
+    <div class="panel">
+      <h2><span class="icon">🖥️</span> Server Information</h2>
+      <div id="dashboard-server-info" class="loading">Loading server info…</div>
+    </div>
+
     <!-- Indexer Status -->
     <div class="panel">
       <h2><span class="icon">🔄</span> Indexer Status</h2>
@@ -79,6 +85,7 @@ export function renderDashboard(container: HTMLElement, _headerControls?: HTMLEl
 
   const connEl = document.getElementById('dashboard-connection');
   const statsEl = document.getElementById('dashboard-stats');
+  const serverInfoEl = document.getElementById('dashboard-server-info');
   const indexerEl = document.getElementById('dashboard-indexer');
 
   // --- Connection Status ---
@@ -135,6 +142,24 @@ export function renderDashboard(container: HTMLElement, _headerControls?: HTMLEl
     })
     .catch(err => {
       if (statsEl) statsEl.innerHTML = `<div class="error">Failed to load stats: ${err.message}</div>`;
+    });
+
+  // --- Server Info ---
+  apiClient.getInfo()
+    .then((info: any) => {
+      if (!serverInfoEl) return;
+
+      serverInfoEl.innerHTML = `
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+                    ${statCard('🏷️', 'Version', info.version || '—', info.revision ? `<span style="font-family: 'IBM Plex Mono', monospace;">${info.revision.substring(0, 7)}</span>` : undefined)}
+                    ${statCard('⏱', 'Uptime', formatUptime(info.uptime_seconds))}
+                    ${statCard('🔑', 'Auth', info.authenticated ? 'Enabled' : 'Disabled')}
+                    ${statCard('⚙️', 'PID', info.pid || '—')}
+                </div>
+            `;
+    })
+    .catch((err: any) => {
+      if (serverInfoEl) serverInfoEl.innerHTML = `<div style="color: var(--text-secondary);">Server info unavailable: ${err.message}</div>`;
     });
 
   // --- Indexer Status ---
