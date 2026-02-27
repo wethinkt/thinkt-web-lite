@@ -86,7 +86,7 @@ export function renderProjects(container: HTMLElement, _headerControls?: HTMLEle
         function sortList(list: MergedProject[]): MergedProject[] {
             const sorted = [...list];
             sorted.sort((a, b) => {
-                let cmp = 0;
+                let cmp: number;
                 if (currentSortField === 'name') {
                     cmp = a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
                 } else {
