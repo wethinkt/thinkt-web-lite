@@ -10,7 +10,8 @@
         "preview": "vite preview",
         "lint": "eslint src",
         "lint:fix": "eslint src --fix",
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+        "ci:check": "npm run lint && npm run typecheck && npm run build"
     },
     "dependencies": {
         "@wethinkt/ts-thinkt": "0.1.17",
@@ -19,7 +20,9 @@
     "author": "Neomantra Corp",
     "license": "MIT",
     "devDependencies": {
+        "@eslint/js": "^10.0.1",
         "typescript": "^5.0.0",
+        "typescript-eslint": "^8.56.1",
         "vite": "^5.0.0"
     }
 }
