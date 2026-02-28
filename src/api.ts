@@ -31,3 +31,17 @@ apiClient.setConfig({
     baseUrl: '',
     ...(token ? { token } : {}),
 });
+
+export function getSessionToken(): string | undefined {
+    return sessionStorage.getItem(SESSION_TOKEN_KEY) ?? undefined;
+}
+
+export function setSessionToken(newToken: string): void {
+    sessionStorage.setItem(SESSION_TOKEN_KEY, newToken);
+    apiClient.setConfig({ baseUrl: '', token: newToken });
+}
+
+export function clearSessionToken(): void {
+    sessionStorage.removeItem(SESSION_TOKEN_KEY);
+    apiClient.setConfig({ baseUrl: '' });
+}

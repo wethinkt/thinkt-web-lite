@@ -5,15 +5,17 @@ import { renderDashboard } from './views/Dashboard';
 import { renderApps } from './views/Apps';
 import { renderThemes } from './views/Themes';
 import { renderLanguages } from './views/Languages';
+import { renderAuth } from './views/Auth';
 import { LOCALE_LABELS, SUPPORTED_LOCALES, type SupportedLocale, getLocale, initI18n, setLocale, t } from './i18n';
 
 const app = document.getElementById('app');
-type ViewName = 'dashboard' | 'projects' | 'sources' | 'apps' | 'themes' | 'languages';
+type ViewName = 'dashboard' | 'projects' | 'sources' | 'auth' | 'apps' | 'themes' | 'languages';
 
 const views: Record<ViewName, { icon: string; labelKey: string; render: (container: HTMLElement, headerControls?: HTMLElement | null) => void }> = {
   dashboard: { icon: '📊', labelKey: 'nav.dashboard', render: renderDashboard },
   projects: { icon: '📁', labelKey: 'nav.projects', render: renderProjects },
   sources: { icon: '🔌', labelKey: 'nav.sources', render: renderSources },
+  auth: { icon: '🔑', labelKey: 'nav.auth', render: renderAuth },
   apps: { icon: '🧩', labelKey: 'nav.apps', render: renderApps },
   themes: { icon: '🎨', labelKey: 'nav.themes', render: renderThemes },
   languages: { icon: '🌐', labelKey: 'nav.languages', render: renderLanguages },

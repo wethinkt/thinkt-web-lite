@@ -23,6 +23,7 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'nav.apps': 'Apps',
     'nav.themes': 'Themes',
     'nav.languages': 'Languages',
+    'nav.auth': 'Auth',
     'nav.apiDocs': 'API Docs',
 
     'error.viewNotImplemented': 'View "{viewName}" not implemented yet',
@@ -123,6 +124,15 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'themes.builtIn': 'Built-in',
     'themes.failedToLoadThemes': 'Failed to load themes: {message}',
 
+    'auth.currentToken': 'Current Token',
+    'auth.noToken': 'No client-side token set. If running via the dev server, authentication is handled by the Vite proxy.',
+    'auth.reveal': 'Reveal',
+    'auth.hide': 'Hide',
+    'auth.clearToken': 'Clear Token',
+    'auth.setNewToken': 'Set New Token',
+    'auth.tokenPlaceholder': 'Paste token here...',
+    'auth.apply': 'Apply',
+
     'languages.loadingLanguages': 'Loading languages...',
     'languages.noLanguagesFound': 'No languages found.',
     'languages.coverage': 'Coverage',
@@ -158,6 +168,7 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'nav.apps': 'Apps',
     'nav.themes': 'Temas',
     'nav.languages': 'Idiomas',
+    'nav.auth': 'Auth',
     'nav.apiDocs': 'Docs API',
 
     'error.viewNotImplemented': 'La vista "{viewName}" aun no esta implementada',
@@ -258,6 +269,15 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'themes.builtIn': 'Integrado',
     'themes.failedToLoadThemes': 'No se pudieron cargar los temas: {message}',
 
+    'auth.currentToken': 'Token actual',
+    'auth.noToken': 'No hay token del lado del cliente. Si se ejecuta desde el servidor de desarrollo, la autenticacion la gestiona el proxy de Vite.',
+    'auth.reveal': 'Mostrar',
+    'auth.hide': 'Ocultar',
+    'auth.clearToken': 'Borrar token',
+    'auth.setNewToken': 'Establecer nuevo token',
+    'auth.tokenPlaceholder': 'Pegar token aqui...',
+    'auth.apply': 'Aplicar',
+
     'languages.loadingLanguages': 'Cargando idiomas...',
     'languages.noLanguagesFound': 'No se encontraron idiomas.',
     'languages.coverage': 'Cobertura',
@@ -293,6 +313,7 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'nav.apps': '应用',
     'nav.themes': '主题',
     'nav.languages': '语言',
+    'nav.auth': '认证',
     'nav.apiDocs': 'API 文档',
 
     'error.viewNotImplemented': '视图“{viewName}”尚未实现',
@@ -392,6 +413,15 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'themes.active': '启用中',
     'themes.builtIn': '内置',
     'themes.failedToLoadThemes': '加载主题失败: {message}',
+
+    'auth.currentToken': '当前令牌',
+    'auth.noToken': '未设置客户端令牌。若通过开发服务器运行，认证由 Vite 代理处理。',
+    'auth.reveal': '显示',
+    'auth.hide': '隐藏',
+    'auth.clearToken': '清除令牌',
+    'auth.setNewToken': '设置新令牌',
+    'auth.tokenPlaceholder': '在此粘贴令牌...',
+    'auth.apply': '应用',
 
     'languages.loadingLanguages': '正在加载语言...',
     'languages.noLanguagesFound': '未找到语言。',
