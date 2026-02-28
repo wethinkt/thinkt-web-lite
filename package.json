@@ -4,7 +4,7 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "THINKT_API_TOKEN=$(~/wethinkt/go-thinkt/bin/thinkt server token 2>/dev/null) vite",
+        "dev": "THINKT_API_TOKEN=$(thinkt server token 2>/dev/null) vite",
         "build": "tsc && vite build",
         "build:fast": "tsc && vite build",
         "preview": "vite preview",
@@ -14,7 +14,7 @@
         "ci:check": "npm run lint && npm run typecheck && npm run build"
     },
     "dependencies": {
-        "@wethinkt/ts-thinkt": "0.1.18",
+        "@wethinkt/ts-thinkt": "0.1.19",
         "eslint": "^10.0.2"
     },
     "author": "Neomantra Corp",

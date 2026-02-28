@@ -22,6 +22,7 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'nav.sources': 'Sources',
     'nav.apps': 'Apps',
     'nav.themes': 'Themes',
+    'nav.languages': 'Languages',
     'nav.apiDocs': 'API Docs',
 
     'error.viewNotImplemented': 'View "{viewName}" not implemented yet',
@@ -122,6 +123,12 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'themes.builtIn': 'Built-in',
     'themes.failedToLoadThemes': 'Failed to load themes: {message}',
 
+    'languages.loadingLanguages': 'Loading languages...',
+    'languages.noLanguagesFound': 'No languages found.',
+    'languages.coverage': 'Coverage',
+    'languages.active': 'Active',
+    'languages.failedToLoadLanguages': 'Failed to load languages: {message}',
+
     'themePreview.previewHeader': 'Preview: {themeName}',
     'themePreview.userLabel': 'USER',
     'themePreview.userExample': 'Hello, can you help me?',
@@ -150,6 +157,7 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'nav.sources': 'Fuentes',
     'nav.apps': 'Apps',
     'nav.themes': 'Temas',
+    'nav.languages': 'Idiomas',
     'nav.apiDocs': 'Docs API',
 
     'error.viewNotImplemented': 'La vista "{viewName}" aun no esta implementada',
@@ -250,6 +258,12 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'themes.builtIn': 'Integrado',
     'themes.failedToLoadThemes': 'No se pudieron cargar los temas: {message}',
 
+    'languages.loadingLanguages': 'Cargando idiomas...',
+    'languages.noLanguagesFound': 'No se encontraron idiomas.',
+    'languages.coverage': 'Cobertura',
+    'languages.active': 'Activo',
+    'languages.failedToLoadLanguages': 'No se pudieron cargar los idiomas: {message}',
+
     'themePreview.previewHeader': 'Vista previa: {themeName}',
     'themePreview.userLabel': 'USUARIO',
     'themePreview.userExample': 'Hola, puedes ayudarme?',
@@ -278,6 +292,7 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'nav.sources': '来源',
     'nav.apps': '应用',
     'nav.themes': '主题',
+    'nav.languages': '语言',
     'nav.apiDocs': 'API 文档',
 
     'error.viewNotImplemented': '视图“{viewName}”尚未实现',
@@ -377,6 +392,12 @@ const translations: Record<SupportedLocale, Record<string, string>> = {
     'themes.active': '启用中',
     'themes.builtIn': '内置',
     'themes.failedToLoadThemes': '加载主题失败: {message}',
+
+    'languages.loadingLanguages': '正在加载语言...',
+    'languages.noLanguagesFound': '未找到语言。',
+    'languages.coverage': '覆盖率',
+    'languages.active': '启用中',
+    'languages.failedToLoadLanguages': '加载语言失败: {message}',
 
     'themePreview.previewHeader': '预览: {themeName}',
     'themePreview.userLabel': '用户',

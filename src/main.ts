@@ -4,10 +4,11 @@ import { renderSources } from './views/Sources';
 import { renderDashboard } from './views/Dashboard';
 import { renderApps } from './views/Apps';
 import { renderThemes } from './views/Themes';
+import { renderLanguages } from './views/Languages';
 import { LOCALE_LABELS, SUPPORTED_LOCALES, type SupportedLocale, getLocale, initI18n, setLocale, t } from './i18n';
 
 const app = document.getElementById('app');
-type ViewName = 'dashboard' | 'projects' | 'sources' | 'apps' | 'themes';
+type ViewName = 'dashboard' | 'projects' | 'sources' | 'apps' | 'themes' | 'languages';
 
 const views: Record<ViewName, { icon: string; labelKey: string; render: (container: HTMLElement, headerControls?: HTMLElement | null) => void }> = {
   dashboard: { icon: '📊', labelKey: 'nav.dashboard', render: renderDashboard },
@@ -15,6 +16,7 @@ const views: Record<ViewName, { icon: string; labelKey: string; render: (contain
   sources: { icon: '🔌', labelKey: 'nav.sources', render: renderSources },
   apps: { icon: '🧩', labelKey: 'nav.apps', render: renderApps },
   themes: { icon: '🎨', labelKey: 'nav.themes', render: renderThemes },
+  languages: { icon: '🌐', labelKey: 'nav.languages', render: renderLanguages },
 };
 
 let currentView: ViewName = 'dashboard';
