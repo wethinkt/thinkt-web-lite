@@ -14,7 +14,7 @@
         "ci:check": "npm run lint && npm run typecheck && npm run build"
     },
     "dependencies": {
-        "@wethinkt/ts-thinkt": "0.1.19",
+        "@wethinkt/ts-thinkt": "0.1.20",
         "eslint": "^10.0.2"
     },
     "author": "Neomantra Corp",
